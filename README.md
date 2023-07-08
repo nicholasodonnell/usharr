@@ -6,7 +6,7 @@
 
 With **Usharr**, you can effortlessly maintain a streamlined movie library by removing unwanted movies based on your preferences and criteria. It integrates with your existing [Radarr](https://radarr.video) and [Tautulli](https://tautulli.com/) services and allows you to define specific rules for removing movies from your library.
 
-[![CD](https://github.com/nicholasodonnell/box-office/actions/workflows/cd.yml/badge.svg)](https://github.com/nicholasodonnell/box-office/actions/workflows/cd.yml)
+[![CD](https://github.com/nicholasodonnell/usharr/actions/workflows/cd.yml/badge.svg)](https://github.com/nicholasodonnell/usharr/actions/workflows/cd.yml)
 
 ## Current Features
 
