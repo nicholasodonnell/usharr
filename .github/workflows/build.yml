@@ -1,0 +1,59 @@
+name: Build
+
+on:
+  workflow_call:
+    outputs:
+      current_version:
+        description: 'Current version in package.json'
+        value: ${{ jobs.build.outputs.current_version }}
+      previous_version:
+        description: 'Previous version according to git tags'
+        value: ${{ jobs.build.outputs.previous_version }}
+
+permissions:
+  checks: write
+  contents: write
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    outputs:
+      current_version: ${{ steps.current_version.outputs.value }}
+      previous_version: ${{ steps.previous_version.outputs.value }}
+
+    steps:
+
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        id: setup
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        id: dependencies
+        run: npm ci
+
+      - name: Prisma Generate
+        id: db_generate
+        run: npm run db:generate
+
+      - id: build
+        name: Build
+        run: npm run build
+
+      - name: Get current version
+        id: current_version
+        run: echo "value=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Get previous version
+        id: previous_version
+        run: |
+          git fetch --tags origin
+          echo "value=$(git tag --sort=committerdate | grep -E '[0-9]' | tail -1 | cut -b 2-7)" >> $GITHUB_OUTPUT

@@ -1,0 +1,10 @@
+# compiled output
+dist
+node_modules
+
+# config
+config
+
+# docker
+Dockerfile
+docker-compose.yml

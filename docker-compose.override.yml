@@ -1,0 +1,17 @@
+version: "3.5"
+services:
+
+  app:
+    build:
+      target: development
+    image: nicholasodonnell/usharr:dev
+    ports:
+      - 3000:3000
+      - 3001:3001
+    volumes:
+      - ./apps/api:/app/apps/api
+      - ./apps/client:/app/apps/client
+      - ./package-lock.json:/app/package-lock.json
+      - ./package.json:/app/package.json
+      - ./packages:/app/packages
+      - ./scripts:/app/scripts

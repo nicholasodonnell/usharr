@@ -1,0 +1,14 @@
+version: "3.5"
+services:
+
+  app:
+    build:
+      context: .
+    image: nicholasodonnell/usharr:latest
+    container_name: usharr
+    environment:
+      - TZ=America/New_York
+    ports:
+      - 5588:5588
+    volumes:
+      - ./config:/config

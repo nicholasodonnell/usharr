@@ -1,0 +1,23 @@
+{
+  "name": "@usharr/usharr",
+  "version": "1.0.0",
+  "author": "Nicholas O'Donnell <nicholas@nicholasodonnell.com>",
+  "license": "SEE LICENSE",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=@usharr/client --workspace=@usharr/api",
+    "dev": "concurrently \"npm run dev --workspace=@usharr/client\" \"npm run dev --workspace=@usharr/api\"",
+    "lint": "npm run lint --workspaces --if-present",
+    "db:deploy": "npm run db:deploy --workspace=@usharr/api",
+    "db:generate": "npm run db:generate --workspace=@usharr/api",
+    "db:migrate": "npm run db:migrate --workspace=@usharr/api",
+    "db:push": "npm run db:push --workspace=@usharr/api"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

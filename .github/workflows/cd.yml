@@ -1,0 +1,38 @@
+name: 'CD'
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  checks: write
+  contents: write
+
+jobs:
+
+  lint:
+    name: Lint
+    uses: ./.github/workflows/lint.yml
+
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yml
+
+  publish_github:
+    name: Publish to GitHub
+    uses: ./.github/workflows/publish-github.yml
+    needs: [lint, build]
+    if: ${{ needs.build.outputs.current_version != needs.build.outputs.previous_version }}
+    secrets: inherit
+    with:
+      version: ${{ needs.build.outputs.current_version }}
+
+  publish_docker:
+    name: Publish to Docker Hub
+    uses: ./.github/workflows/publish-docker.yml
+    needs: [lint, build]
+    if: ${{ needs.build.outputs.current_version != needs.build.outputs.previous_version }}
+    secrets: inherit
+    with:
+      version: ${{ needs.build.outputs.current_version }}

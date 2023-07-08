@@ -1,0 +1,95 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:/config/usharr.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Tag {
+  id        Int        @id
+  name      String
+  movieTags MovieTag[]
+  ruleTags  RuleTag[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Movie {
+  id                   Int        @id
+  title                String
+  alternativeTitles    String?
+  tmdbId               Int?
+  poster               String?
+  watched              Boolean    @default(false)
+  lastWatchedAt        DateTime?
+  ignored              Boolean    @default(false)
+  deleted              Boolean    @default(false)
+  downloadedAt         DateTime
+  imdbRating           Float?
+  tmdbRating           Float?
+  metacriticRating     Float?
+  rottenTomatoesRating Float?
+  tags                 MovieTag[]
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+  deletedAt            DateTime?
+}
+
+model MovieTag {
+  id      Int   @id @default(autoincrement())
+  movie   Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  movieId Int
+  tag     Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId   Int
+
+  @@unique([movieId, tagId])
+}
+
+model Settings {
+  id               Int      @id @default(autoincrement())
+  radarrUrl        String?
+  radarrApiKey     String?
+  tautulliUrl      String?
+  tautulliApiKey   String?
+  tautlliLibraryId Int?
+  enabled          Boolean  @default(false)
+  syncDays         Int?     @default(1)
+  syncHour         Int?     @default(3)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Rule {
+  id                          Int       @id @default(autoincrement())
+  name                        String
+  enabled                     Boolean   @default(false)
+  downloadedDaysAgo           Int?
+  watched                     Boolean?
+  watchedDaysAgo              Int?
+  minimumImdbRating           Float?
+  minimumTmdbRating           Float?
+  minimumMetacriticRating     Float?
+  minimumRottenTomatoesRating Float?
+  tags                        RuleTag[]
+  createdAt                   DateTime  @default(now())
+  updatedAt                   DateTime  @updatedAt
+}
+
+model RuleTag {
+  id     Int  @id @default(autoincrement())
+  rule   Rule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  ruleId Int
+  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId  Int
+
+  @@unique([ruleId, tagId])
+}
+
+model Sync {
+  id         Int       @id @default(autoincrement())
+  type       String    @default("FULL") // FULL, PARTIAL
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime? @default(now())
+}
