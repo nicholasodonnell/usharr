@@ -12,6 +12,12 @@ on:
         required: true
       DOCKERHUB_TOKEN:
         required: true
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        description: 'The version to publish'
+        required: true
 
 permissions:
   checks: write
