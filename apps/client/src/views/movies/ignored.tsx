@@ -22,6 +22,13 @@ export default function Ignored(): JSX.Element {
     await fetch()
   }
 
+  const handleIgnore = async (movie: MovieModel) => {
+    await mutate(movie.id, { ...movie, ignored: true })
+    addToast({ message: 'Movie ignored' })
+
+    await fetch()
+  }
+
   return (
     <Section>
       <Title>Movies &#8212; Ignored</Title>
@@ -29,8 +36,8 @@ export default function Ignored(): JSX.Element {
         {movies?.map((movie) => (
           <Movie
             key={movie.id}
-            action="Monitor"
-            onAction={movie.ignored ? handleMonitor : null}
+            action={movie.ignored ? 'Monitor' : 'Always Ignore'}
+            onAction={movie.ignored ? handleMonitor : handleIgnore}
             movie={movie}
           />
         ))}
