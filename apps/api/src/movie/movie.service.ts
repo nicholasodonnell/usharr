@@ -106,41 +106,27 @@ export class MovieService {
   }
 
   /**
-   * Returns a list of monitored movies. Monitored movies are movies that are:
-   * - not ignored
-   * - not deleted
-   * - has a tag enabled on a rule (if any rule does not have tags, ignore tags)
-   * - has a watched status that matches the watched status of all rules (if a rule has a different watched status, ignore watched status)
+   * Returns a list of monitored movies. Monitored movies are movies that match at least one rule excluding:
+   * - movies that are explicitly ignored
+   * - movies that are deleted
+   * - last watched age (variable)
+   * - download age (variable)
    */
   async getMonitored(): Promise<Movie[]> {
     try {
-      const enabledRules = await this.rule.getEnabled()
+      const enabledRules: Rule[] = await this.rule.getEnabled()
+      let monitoredIds = []
 
-      const shouldFilterByTag = enabledRules.every((rule) => rule.tags.length)
-      const shouldFilterByWatched = enabledRules.every((rule) => rule.watched)
-      const shouldFilterByUnwatched = enabledRules.every(
-        (rule) => rule.watched === false,
-      )
-
-      const watched = shouldFilterByWatched
-        ? true
-        : shouldFilterByUnwatched
-        ? false
-        : undefined
-      const tagIds = shouldFilterByTag
-        ? enabledRules.flatMap((rule) => rule.tags.map((tag) => tag.id))
-        : undefined
+      for (const rule of enabledRules) {
+        monitoredIds = [
+          ...monitoredIds,
+          ...(await this.getForRule(rule, true)).map((movie) => movie.id),
+        ]
+      }
 
       const where: Prisma.MovieWhereInput = {
-        watched,
-        ignored: false,
-        deleted: false,
-        tags: {
-          some: {
-            tagId: {
-              in: tagIds,
-            },
-          },
+        id: {
+          in: monitoredIds,
         },
       }
 
@@ -208,8 +194,9 @@ export class MovieService {
 
   /**
    * Returns a list of movies that match the provided rule
+   * @param ignoreVariable If true, variable rules (downloadedDaysAgo, watchedDaysAgo) will be ignored
    */
-  async getForRule(rule: Rule): Promise<Movie[]> {
+  async getForRule(rule: Rule, ignoreVariable = false): Promise<Movie[]> {
     try {
       const {
         downloadedDaysAgo,
@@ -226,16 +213,18 @@ export class MovieService {
         ignored: false,
         deleted: false,
         watched: watched ?? undefined,
-        lastWatchedAt: watchedDaysAgo
-          ? {
-              lte: new Date(Date.now() - watchedDaysAgo * ONE_DAY_MS),
-            }
-          : undefined,
-        downloadedAt: downloadedDaysAgo
-          ? {
-              lte: new Date(Date.now() - downloadedDaysAgo * ONE_DAY_MS),
-            }
-          : undefined,
+        lastWatchedAt:
+          !ignoreVariable && watchedDaysAgo
+            ? {
+                lte: new Date(Date.now() - watchedDaysAgo * ONE_DAY_MS),
+              }
+            : undefined,
+        downloadedAt:
+          !ignoreVariable && downloadedDaysAgo
+            ? {
+                lte: new Date(Date.now() - downloadedDaysAgo * ONE_DAY_MS),
+              }
+            : undefined,
         imdbRating: minimumImdbRating
           ? {
               lte: minimumImdbRating,
