@@ -18,6 +18,7 @@ With **Usharr**, you can effortlessly maintain a streamlined movie library by re
 - **Metacritic Rating** — Delete movies with a low [Metacritic](https://www.metacritic.com/) rating.
 - **Rotten Tomatoes Rating** — Delete movies with a low [Rotten Tomatoes](https://www.rottentomatoes.com/) rating.
 - **Tags** — Only monitor movies with specific tags in Radarr.
+- **Lists** — Monitor when movies fall off of a list in Radarr.
 - **Ignore movies** — Mark individual movies as ignored so they are never deleted.
 - **Full Radarr integration** — Fully syncs with your existing Radarr library. When a movie is removed by Usharr, the movie file is deleted from your library and excluded in Radarr.
 - **Full Tautulli integration** — Fully syncs with your existing Tautulli instance. Watched movies are synced from Tautulli to Usharr so your rules stay up-to-date.
