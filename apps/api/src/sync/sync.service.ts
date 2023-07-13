@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import type {
+  ImportlistMovie,
   Movie,
   RadarrMovie,
   RadarrPing,
@@ -141,7 +142,13 @@ export class SyncService {
       }
 
       const radarrMovies: RadarrMovie[] = await this.radarr.getMovies()
+      const importlistMovies: ImportlistMovie[] =
+        await this.radarr.getImportlistMovies()
+
       const radarrMovieIds: number[] = radarrMovies.map((movie) => movie.id)
+      const importlistMoviesTmdbIds: number[] = importlistMovies.map(
+        (movie) => movie.tmdbId,
+      )
 
       for await (const radarrMovie of radarrMovies) {
         // skip movies that have not been downloaded
@@ -167,6 +174,7 @@ export class SyncService {
           rottenTomatoesRating: radarrMovie.ratings?.rottenTomatoes?.value
             ? Math.floor(radarrMovie.ratings.rottenTomatoes.value)
             : null,
+          appearsInList: importlistMoviesTmdbIds.includes(radarrMovie.tmdbId),
           poster: radarrMovie.images?.find(
             (image) => image.coverType === 'poster',
           )?.remoteUrl,

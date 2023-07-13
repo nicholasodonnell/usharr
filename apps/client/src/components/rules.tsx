@@ -116,6 +116,18 @@ export function Rule({
                 </P>
               </div>
             )}
+            {rule.appearsInList !== null && (
+              <div className="grid grid-cols-4">
+                <P className="col-span-3" bold>
+                  In Lists
+                </P>
+                <P className="truncate">
+                  <P className="truncate">
+                    {rule.appearsInList ? 'Yes' : 'No'}
+                  </P>
+                </P>
+              </div>
+            )}
             {rule.minimumImdbRating && (
               <div className="grid grid-cols-4">
                 <P className="col-span-3" bold>
