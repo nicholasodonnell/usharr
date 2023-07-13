@@ -25,6 +25,7 @@ const select: Prisma.MovieSelect = {
   tmdbRating: true,
   metacriticRating: true,
   rottenTomatoesRating: true,
+  appearsInList: true,
   tags: {
     select: {
       tag: {
@@ -65,6 +66,7 @@ export class MovieService {
       tmdbRating,
       metacriticRating,
       rottenTomatoesRating,
+      appearsInList,
       tags = [],
       deletedAt,
     } = record
@@ -84,6 +86,7 @@ export class MovieService {
       tmdbRating,
       metacriticRating,
       rottenTomatoesRating,
+      appearsInList,
       tags: tags.map((tag) => tag.tag),
       deletedAt: deletedAt ? new Date(deletedAt) : null,
     }
@@ -202,6 +205,7 @@ export class MovieService {
         downloadedDaysAgo,
         watched,
         watchedDaysAgo,
+        appearsInList,
         minimumImdbRating,
         minimumTmdbRating,
         minimumMetacriticRating,
@@ -219,6 +223,7 @@ export class MovieService {
                 lte: new Date(Date.now() - watchedDaysAgo * ONE_DAY_MS),
               }
             : undefined,
+        appearsInList: appearsInList ?? undefined,
         downloadedAt:
           !ignoreVariable && downloadedDaysAgo
             ? {
@@ -285,6 +290,7 @@ export class MovieService {
         tmdbRating,
         metacriticRating,
         rottenTomatoesRating,
+        appearsInList,
         tags,
         deletedAt,
       } = movie
@@ -303,6 +309,7 @@ export class MovieService {
         tmdbRating,
         metacriticRating,
         rottenTomatoesRating,
+        appearsInList,
         tags: tags
           ? {
               create: tags.map((tag) => ({

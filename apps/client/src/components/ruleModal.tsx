@@ -112,6 +112,19 @@ export default function RuleModal({
             />
           </Field>
           <Field>
+            <Label className="col-span-1">In Radarr List</Label>
+            <Select<boolean>
+              className="col-span-3"
+              options={[
+                { label: '', value: null },
+                { label: 'Yes', value: true },
+                { label: 'No', value: false },
+              ]}
+              onChange={setProperty('appearsInList')}
+              value={rule?.appearsInList}
+            />
+          </Field>
+          <Field>
             <Label className="col-span-1">IMDB Rating less than (%)</Label>
             <NumberInput
               className="col-span-3"

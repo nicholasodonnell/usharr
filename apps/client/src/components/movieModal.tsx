@@ -76,6 +76,12 @@ export default function MovieModal({
                   {new Date(movie.downloadedAt).toLocaleDateString()}
                 </P>
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <P bold>Appears in List</P>
+                <P className="break-words">
+                  {movie.appearsInList ? 'Yes' : 'No'}
+                </P>
+              </div>
               {movie.imdbRating && (
                 <div className="grid grid-cols-2 gap-4">
                   <P bold>IMDB Rating</P>

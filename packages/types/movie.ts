@@ -15,6 +15,7 @@ export type Movie = {
   tmdbRating: number | null
   metacriticRating: number | null
   rottenTomatoesRating: number | null
+  appearsInList: boolean
   tags: Tag[]
   deletedAt: Date | null
 }

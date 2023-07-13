@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import type {
+  ImportlistMovie,
   RadarrMediaManagement,
   RadarrMovie,
   RadarrPing,
@@ -106,6 +107,29 @@ export class RadarrService {
     } catch (e) {
       const error = new Error(
         `Failed to retrieve media management config: ${e.message}`,
+      )
+      this.logger.error(error.message)
+
+      throw error
+    }
+  }
+
+  /**
+   * Get all import list movies (movies that appear on a list)
+   */
+  public async getImportlistMovies(
+    radarrSettings?: RadarrSettings,
+  ): Promise<ImportlistMovie[]> {
+    try {
+      const client = await this.createClient(radarrSettings)
+      const response = await client.get<ImportlistMovie[]>(
+        '/api/v3/importlist/movie',
+      )
+
+      return response.data
+    } catch (e: any) {
+      const error = new Error(
+        `Failed to retrieve import list movies: ${e.message}`,
       )
       this.logger.error(error.message)
 

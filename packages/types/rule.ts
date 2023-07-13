@@ -7,6 +7,7 @@ export type Rule = {
   downloadedDaysAgo: number | null
   watched: boolean | null
   watchedDaysAgo: number | null
+  appearsInList: boolean | null
   minimumImdbRating: number | null
   minimumTmdbRating: number | null
   minimumMetacriticRating: number | null
