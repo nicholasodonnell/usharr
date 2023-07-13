@@ -10,8 +10,8 @@ import type {
   Sync,
   SyncType,
   Tag,
-  TautulliMediaInfo,
   TautulliPing,
+  TautulliWatchHistory,
 } from '@usharr/types'
 
 import { MovieService } from '../movie/movie.service'
@@ -249,24 +249,34 @@ export class SyncService {
       const moviesToSync: Movie[] = await this.movie.getNotDeleted()
 
       for await (const movieToSync of moviesToSync) {
-        const mediaInfo: TautulliMediaInfo | undefined =
-          await this.tautulli.searchHistoryForAllMovieTitles([
+        const watchHistory: TautulliWatchHistory[] =
+          await this.tautulli.getWatchHistoryFromAllLibrariesForTitles([
             movieToSync.title,
             ...movieToSync.alternativeTitles,
           ])
 
-        if (!mediaInfo) {
+        if (watchHistory.length === 0) {
           this.logger.warn(`No watch history found for "${movieToSync.title}"`)
 
           continue
         }
 
+        const watched = watchHistory.some(
+          (item: TautulliWatchHistory) => item.watched,
+        )
+
+        const lastWatchedAt = watched
+          ? new Date(
+              Math.max(
+                ...watchHistory.map((item) => item.lastWatchedAt.getTime()),
+              ),
+            )
+          : null
+
         const movie: Movie = await this.movie.createOrUpdate({
           ...movieToSync,
-          watched: mediaInfo.play_count > 0,
-          lastWatchedAt: mediaInfo.last_played
-            ? new Date(mediaInfo.last_played * 1000)
-            : null,
+          watched,
+          lastWatchedAt,
         })
 
         this.logger.log(`Synced watch history for "${movie.title}"`)

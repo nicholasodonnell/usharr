@@ -247,7 +247,7 @@ export function MultipleSelect<T>({
   className,
   disabled = false,
   onChange,
-  options,
+  options = [],
   required = false,
   values = [],
 }: MultipleSelectProps<T>): JSX.Element {

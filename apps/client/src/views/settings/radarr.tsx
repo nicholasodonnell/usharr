@@ -1,5 +1,5 @@
 import type { RadarrPing, RadarrSettings } from '@usharr/types'
-import React, { useState } from 'react'
+import React from 'react'
 
 import Alert from '../../components/alert'
 import Button from '../../components/button'
@@ -21,14 +21,12 @@ export default function Radarr(): JSX.Element {
   const { create: radarrSync } = useCreate('/api/sync/radarr')
   const [settings, setSettings] = useAsyncState<RadarrSettings>(settingsData)
   const [ping, setPing] = useAsyncState<RadarrPing>(pingData)
-  const [saveEnabled, setSaveEnabled] = useState<boolean>(false)
   const { addToast } = useToast()
 
   const handlePing = async () => {
     const pingResponse = await postPing(settings)
     setPing(pingResponse)
 
-    setSaveEnabled(Boolean(pingResponse?.success))
     addToast({
       message: pingResponse?.success
         ? 'Radarr connection established successfully'
@@ -45,7 +43,6 @@ export default function Radarr(): JSX.Element {
   }
 
   const setProperty = (property: string) => (value: any) => {
-    setSaveEnabled(false)
     setSettings({
       ...settings,
       [property]: value,
@@ -109,7 +106,12 @@ export default function Radarr(): JSX.Element {
             Test
           </Button>
           <Button
-            disabled={settingsLoading || pingLoading || !saveEnabled}
+            disabled={
+              settingsLoading ||
+              pingLoading ||
+              !settings?.radarrUrl ||
+              !settings?.radarrApiKey
+            }
             type="submit">
             Save
           </Button>

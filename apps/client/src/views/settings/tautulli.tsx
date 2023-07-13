@@ -1,5 +1,5 @@
 import type { TautulliSettings, TautulliPing } from '@usharr/types'
-import React, { useState } from 'react'
+import React from 'react'
 
 import Alert from '../../components/alert'
 import Button from '../../components/button'
@@ -7,9 +7,9 @@ import {
   Actions,
   Field,
   Form,
-  Label,
   Input,
-  Select,
+  Label,
+  MultipleSelect,
 } from '../../components/form'
 import Section, { Title } from '../../components/section'
 import { useCreate, useFetch } from '../../hooks/useApi'
@@ -28,27 +28,18 @@ export default function Tautulli(): JSX.Element {
   const { create: tautulliSync } = useCreate('/api/sync/tautulli')
   const [settings, setSettings] = useAsyncState<TautulliSettings>(settingsData)
   const [ping, setPing] = useAsyncState<TautulliPing>(pingData)
-  const [saveEnabled, setSaveEnabled] = useState<boolean>(false)
   const { addToast } = useToast()
 
   const handlePing = async () => {
     const pingResponse = await postPing(settings)
     setPing(pingResponse)
 
-    setSaveEnabled(Boolean(pingResponse?.success))
     addToast({
       message: pingResponse?.success
         ? 'Tautulli connection established successfully'
         : 'Tautulli connection failed',
       type: pingResponse?.success ? 'info' : 'error',
     })
-
-    if (pingResponse?.libraries?.length > 0) {
-      setSettings({
-        ...settings,
-        tautlliLibraryId: pingResponse.libraries[0].section_id,
-      })
-    }
   }
 
   const handleSubmit = async () => {
@@ -59,7 +50,6 @@ export default function Tautulli(): JSX.Element {
   }
 
   const setProperty = (property: string) => (value: any) => {
-    setSaveEnabled(false)
     setSettings({
       ...settings,
       [property]: value,
@@ -104,9 +94,9 @@ export default function Tautulli(): JSX.Element {
         </Field>
         <Field>
           <Label className="col-span-1" required>
-            Library
+            Libraries
           </Label>
-          <Select<number>
+          <MultipleSelect<number | null>
             className="col-span-3"
             disabled={
               settingsLoading ||
@@ -118,9 +108,9 @@ export default function Tautulli(): JSX.Element {
               label: section_name,
               value: section_id,
             }))}
-            onChange={setProperty('tautlliLibraryId')}
+            onChange={setProperty('tautlliLibraryIds')}
             required
-            value={settings?.tautlliLibraryId}
+            values={settings?.tautlliLibraryIds}
           />
         </Field>
         <Actions>
@@ -131,7 +121,13 @@ export default function Tautulli(): JSX.Element {
             Test
           </Button>
           <Button
-            disabled={settingsLoading || pingLoading || !saveEnabled}
+            disabled={
+              settingsLoading ||
+              pingLoading ||
+              !settings?.tautulliUrl ||
+              !settings?.tautulliApiKey ||
+              settings?.tautlliLibraryIds?.length < 1
+            }
             type="submit">
             Save
           </Button>
