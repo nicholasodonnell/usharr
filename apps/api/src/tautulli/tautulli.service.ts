@@ -165,6 +165,9 @@ export class TautulliService {
 
           if (mediaInfo) {
             matches.push(mediaInfo)
+
+            // break out of the loop if we found a match for this title
+            break
           }
         }
       }
