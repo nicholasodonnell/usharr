@@ -49,17 +49,17 @@ model MovieTag {
 }
 
 model Settings {
-  id               Int      @id @default(autoincrement())
-  radarrUrl        String?
-  radarrApiKey     String?
-  tautulliUrl      String?
-  tautulliApiKey   String?
-  tautlliLibraryId Int?
-  enabled          Boolean  @default(false)
-  syncDays         Int?     @default(1)
-  syncHour         Int?     @default(3)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  radarrUrl         String?
+  radarrApiKey      String?
+  tautulliUrl       String?
+  tautulliApiKey    String?
+  tautlliLibraryIds String?
+  enabled           Boolean  @default(false)
+  syncDays          Int?     @default(1)
+  syncHour          Int?     @default(3)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model Rule {

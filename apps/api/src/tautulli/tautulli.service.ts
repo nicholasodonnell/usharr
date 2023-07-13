@@ -6,6 +6,7 @@ import type {
   TautulliMediaInfo,
   TautulliPing,
   TautulliSettings,
+  TautulliWatchHistory,
 } from '@usharr/types'
 import type { AxiosInstance } from 'axios'
 import axios from 'axios'
@@ -95,12 +96,13 @@ export class TautulliService {
   }
 
   /**
-   * Search Tautulli for media info for a given movie title (search string)
+   * Search Tautulli for media info for a given movie title (search string) and library (section_id)
    */
   async searchMediaInfoForTitle(
     title: string,
+    libraryId: number,
     tautulliSettings?: TautulliSettings,
-  ): Promise<TautulliMediaInfo | undefined> {
+  ): Promise<TautulliWatchHistory | undefined> {
     try {
       const client = await this.createClient(tautulliSettings)
       const response = await client.get<TautulliGetLibraryMediaInfoResponse>(
@@ -110,7 +112,7 @@ export class TautulliService {
             cmd: 'get_library_media_info',
             refresh: true,
             search: title,
-            section_id: (await this.settings.getTautulli())?.tautlliLibraryId,
+            section_id: libraryId,
             section_type: 'movie',
           },
         },
@@ -118,11 +120,17 @@ export class TautulliService {
 
       const items: TautulliMediaInfo[] =
         response.data?.response?.data?.data ?? []
+
       const match: TautulliMediaInfo = items.find(
         (item) => item.title === title,
       )
 
       return match
+        ? {
+            watched: match.play_count > 0,
+            lastWatchedAt: new Date(match.last_played * 1000),
+          }
+        : undefined
     } catch (e) {
       const error = new Error(
         `Failed to get media info for "${title}": ${e.message}`,
@@ -135,25 +143,36 @@ export class TautulliService {
 
   /**
    * Search Tautulli for media info for all movie titles
-   * Loops through all titles until a match is found
+   * Loops through all titles and libraries for matches
    */
-  async searchHistoryForAllMovieTitles(
+  async getWatchHistoryFromAllLibrariesForTitles(
     titles: string[],
     tautulliSettings?: TautulliSettings,
-  ): Promise<TautulliMediaInfo | undefined> {
+  ): Promise<TautulliWatchHistory[]> {
     try {
-      for await (const title of titles) {
-        const mediaInfo = await this.searchMediaInfoForTitle(
-          title,
-          tautulliSettings,
-        )
+      const matches: TautulliWatchHistory[] = []
 
-        if (mediaInfo) {
-          return mediaInfo
+      const { tautlliLibraryIds } =
+        tautulliSettings ?? (await this.settings.getTautulli())
+
+      for await (const libraryId of tautlliLibraryIds) {
+        for await (const title of titles) {
+          const mediaInfo = await this.searchMediaInfoForTitle(
+            title,
+            libraryId,
+            tautulliSettings,
+          )
+
+          if (mediaInfo) {
+            matches.push(mediaInfo)
+
+            // break out of the loop if we found a match for this title
+            break
+          }
         }
       }
 
-      return undefined
+      return matches
     } catch (e) {
       const error = new Error(
         `Failed to get media info for titles: ${e.message}`,

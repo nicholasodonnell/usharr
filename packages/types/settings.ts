@@ -12,7 +12,7 @@ export type RadarrSettings = {
 export type TautulliSettings = {
   tautulliUrl: string | null
   tautulliApiKey: string | null
-  tautlliLibraryId: number | null
+  tautlliLibraryIds: number[] | null
 }
 
 export type Settings = GeneralSettings & RadarrSettings & TautulliSettings

@@ -14,6 +14,11 @@ export type TautulliMediaInfo = {
   play_count: number
 }
 
+export type TautulliWatchHistory = {
+  watched: boolean
+  lastWatchedAt: Date
+}
+
 export type TautulliGetLibraryNamesResponse = {
   response: {
     result: string

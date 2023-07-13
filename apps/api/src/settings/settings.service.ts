@@ -20,7 +20,7 @@ const radarrSettingsSelect: Prisma.SettingsSelect = {
 const tautulliSettingsSelect: Prisma.SettingsSelect = {
   tautulliUrl: true,
   tautulliApiKey: true,
-  tautlliLibraryId: true,
+  tautlliLibraryIds: true,
 }
 
 @Injectable()
@@ -38,6 +38,18 @@ export class SettingsService implements OnModuleInit {
       create: { id: this.id },
       update: {},
     })
+  }
+
+  // priv methods //
+
+  private serializeTautulliRecord(record): TautulliSettings {
+    const { tautulliUrl, tautulliApiKey, tautlliLibraryIds } = record
+
+    return {
+      tautulliUrl,
+      tautulliApiKey,
+      tautlliLibraryIds: tautlliLibraryIds?.split(',').map(Number) ?? [],
+    }
   }
 
   // public methods //
@@ -115,7 +127,11 @@ export class SettingsService implements OnModuleInit {
    */
   async getTautulli(): Promise<TautulliSettings> {
     try {
-      return this.findFirst<TautulliSettings>(tautulliSettingsSelect)
+      const record = await this.findFirst<TautulliSettings>(
+        tautulliSettingsSelect,
+      )
+
+      return this.serializeTautulliRecord(record)
     } catch (e) {
       const error = new Error(`Failed to get tautulli settings: ${e.message}`)
       this.logger.error(error.message)
@@ -129,8 +145,12 @@ export class SettingsService implements OnModuleInit {
    */
   async updateTautulli(settings: TautulliSettings): Promise<TautulliSettings> {
     try {
-      const { tautulliUrl, tautulliApiKey, tautlliLibraryId } = settings
-      const data = { tautulliUrl, tautulliApiKey, tautlliLibraryId }
+      const { tautulliUrl, tautulliApiKey, tautlliLibraryIds } = settings
+      const data = {
+        tautulliUrl,
+        tautulliApiKey,
+        tautlliLibraryIds: tautlliLibraryIds?.join(',') ?? undefined,
+      }
 
       return this.update<TautulliSettings>({
         update: data,
