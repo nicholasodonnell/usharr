@@ -1,6 +1,6 @@
 {
   "name": "@usharr/client",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "scripts": {
     "build": "webpack --mode production",
     "dev": "TAILWIND_MODE=watch webpack serve --mode development",
