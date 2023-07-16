@@ -28,18 +28,21 @@ export function Movie({ action, movie, onAction }: MovieProps): JSX.Element {
         className="bg-app-background border-app-background-accent relative block w-full cursor-pointer overflow-hidden rounded-md border shadow transition-all hover:scale-105 hover:shadow-lg"
         onClick={() => setModalOpen(true)}>
         <img
-          className="aspect-[2/3] w-full h-full"
+          className="aspect-[2/3] w-full h-full z-10 relative"
           src={movie.poster}
           alt={movie.title}
           loading="lazy"
         />
+        <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-20 text-transparent pointer-events-none">
+          {movie.title}
+        </span>
         {movie.ignored && (
-          <span className="bg-app-background font-small border-app-background-accent absolute left-2 top-2 rounded-lg border-[1px] p-1 text-white shadow-lg uppercase">
+          <span className="bg-app-background font-small border-app-background-accent absolute left-2 top-2 rounded-lg border-[1px] p-1 text-white shadow-lg uppercase text-sm z-30">
             Ignored
           </span>
         )}
         {movie.daysUntilDeletion && movie.daysUntilDeletion !== null && (
-          <span className="bg-red font-small border-app-background-accent absolute left-2 top-2 rounded-lg border-[1px] p-1 text-white shadow-lg uppercase">
+          <span className="bg-red font-small border-app-background-accent absolute left-2 top-2 rounded-lg border-[1px] p-1 text-white shadow-lg uppercase text-sm z-30">
             {movie.daysUntilDeletion} day{movie.daysUntilDeletion !== 1 && 's'}
           </span>
         )}

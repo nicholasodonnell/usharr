@@ -1,6 +1,7 @@
 import type { Movie as MovieModel } from '@usharr/types'
-import React from 'react'
+import React, { useState } from 'react'
 
+import { Input } from '../../components/form'
 import Movies, { Movie } from '../../components/movies'
 import Section, { Title } from '../../components/section'
 import { useFetch, useMutate } from '../../hooks/useApi'
@@ -14,6 +15,7 @@ export default function Ignored(): JSX.Element {
   } = useFetch<MovieModel[]>('/api/movies/ignored')
   const { mutate } = useMutate<MovieModel>('/api/movies/:id')
   const { addToast } = useToast()
+  const [search, setSearch] = useState<string>('')
 
   const handleMonitor = async (movie: MovieModel) => {
     await mutate(movie.id, { ...movie, ignored: false })
@@ -32,15 +34,27 @@ export default function Ignored(): JSX.Element {
   return (
     <Section>
       <Title>Movies &#8212; Ignored</Title>
+      <Input
+        placeholder="Search"
+        className="w-full mb-4"
+        onChange={setSearch}
+        value={search}
+      />
       <Movies loading={loading}>
-        {movies?.map((movie) => (
-          <Movie
-            key={movie.id}
-            action={movie.ignored ? 'Monitor' : 'Always Ignore'}
-            onAction={movie.ignored ? handleMonitor : handleIgnore}
-            movie={movie}
-          />
-        ))}
+        {movies
+          ?.filter((movie) =>
+            search
+              ? movie.title.toLowerCase().includes(search.toLowerCase())
+              : true,
+          )
+          ?.map((movie) => (
+            <Movie
+              key={movie.id}
+              action={movie.ignored ? 'Monitor' : 'Always Ignore'}
+              onAction={movie.ignored ? handleMonitor : handleIgnore}
+              movie={movie}
+            />
+          ))}
       </Movies>
     </Section>
   )
