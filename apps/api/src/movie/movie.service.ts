@@ -105,6 +105,7 @@ export class MovieService {
       watchedDaysAgo && lastWatchedAt
         ? watchedDaysAgo - this.util.daysSince(lastWatchedAt)
         : Infinity,
+      0,
     )
 
     return {
