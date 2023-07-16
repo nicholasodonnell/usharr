@@ -38,9 +38,9 @@ export function Movie({ action, movie, onAction }: MovieProps): JSX.Element {
             Ignored
           </span>
         )}
-        {movie.daysUntilDeletion && (
+        {movie.daysUntilDeletion !== null && (
           <span className="bg-red font-small border-app-background-accent absolute left-2 top-2 rounded-lg border-[1px] p-1 text-white shadow-lg uppercase">
-            {movie.daysUntilDeletion} days
+            {movie.daysUntilDeletion} day{movie.daysUntilDeletion !== 1 && 's'}
           </span>
         )}
       </a>
