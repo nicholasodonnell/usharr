@@ -122,7 +122,7 @@ export default function MovieModal({
               )}
               {movie.daysUntilDeletion && movie.daysUntilDeletion !== null && (
                 <div className="grid grid-cols-2 gap-4">
-                  <P bold>Delete in</P>
+                  <P bold>Time Remaining</P>
                   <P className="break-words text-red" bold>
                     {movie.daysUntilDeletion} days
                   </P>
