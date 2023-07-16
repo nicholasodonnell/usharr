@@ -114,6 +114,20 @@ export default function MovieModal({
                   </P>
                 </div>
               )}
+              {movie.matchedRule && (
+                <div className="grid grid-cols-2 gap-4">
+                  <P bold>Matched Rule</P>
+                  <P className="break-words">{movie.matchedRule.name}</P>
+                </div>
+              )}
+              {movie.daysUntilDeletion && movie.daysUntilDeletion !== null && (
+                <div className="grid grid-cols-2 gap-4">
+                  <P bold>Delete in</P>
+                  <P className="break-words text-red" bold>
+                    {movie.daysUntilDeletion} days
+                  </P>
+                </div>
+              )}
             </div>
           </div>
           <Actions>

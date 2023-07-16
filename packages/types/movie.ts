@@ -1,3 +1,4 @@
+import { Rule } from './rule'
 import { Tag } from './tag'
 
 export type Movie = {
@@ -22,4 +23,5 @@ export type Movie = {
 
   // computed
   daysUntilDeletion?: number | null
+  matchedRule?: Rule | null
 }
