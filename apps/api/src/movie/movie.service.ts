@@ -160,7 +160,9 @@ export class MovieService {
         }
       }
 
-      return Object.values(moviesMap)
+      return Object.values(moviesMap).sort(
+        (a, b) => a.daysUntilDeletion - b.daysUntilDeletion,
+      )
     } catch (e) {
       const error = new Error(`Failed to get monitored movies: ${e.message}`)
       this.logger.error(error.message)
