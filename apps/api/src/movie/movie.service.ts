@@ -94,7 +94,7 @@ export class MovieService {
     }
   }
 
-  private withDaysUntilDeletion(movie: Movie, rule: Rule): Movie {
+  private withComputed(movie: Movie, rule: Rule): Movie {
     const { downloadedAt, lastWatchedAt } = movie
     const { downloadedDaysAgo, watchedDaysAgo } = rule
 
@@ -110,6 +110,7 @@ export class MovieService {
     return {
       ...movie,
       daysUntilDeletion: daysUntilDeletion === Infinity ? 0 : daysUntilDeletion,
+      matchedRule: rule,
     }
   }
 
@@ -143,8 +144,7 @@ export class MovieService {
 
       for (const rule of enabledRules) {
         const records: Movie[] = await this.getForRule(rule, true).then(
-          (movies) =>
-            movies.map((movie) => this.withDaysUntilDeletion(movie, rule)),
+          (movies) => movies.map((movie) => this.withComputed(movie, rule)),
         )
 
         // dedupe movies based on `daysUntilDeletion`
