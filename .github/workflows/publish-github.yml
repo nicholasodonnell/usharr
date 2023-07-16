@@ -35,6 +35,6 @@ jobs:
         id: release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.tag.outputs.new_tag }}
+          generateReleaseNotes: true
           name: ${{ steps.tag.outputs.new_tag }}
-          body: ${{ steps.tag.outputs.changelog }}
+          tag: ${{ steps.tag.outputs.new_tag }}
