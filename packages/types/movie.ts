@@ -1,6 +1,7 @@
 import { Tag } from './tag'
 
 export type Movie = {
+  // schema
   id: number
   title: string
   alternativeTitles: string[]
@@ -18,4 +19,7 @@ export type Movie = {
   appearsInList: boolean
   tags: Tag[]
   deletedAt: Date | null
+
+  // computed
+  daysUntilDeletion?: number | null
 }

@@ -34,8 +34,13 @@ export function Movie({ action, movie, onAction }: MovieProps): JSX.Element {
           loading="lazy"
         />
         {movie.ignored && (
-          <span className="bg-app-background font-small border-app-background-accent absolute left-2 top-2 rounded-lg border-[1px] p-1 text-white shadow">
+          <span className="bg-app-background font-small border-app-background-accent absolute left-2 top-2 rounded-lg border-[1px] p-1 text-white shadow-lg uppercase">
             Ignored
+          </span>
+        )}
+        {movie.daysUntilDeletion && (
+          <span className="bg-red font-small border-app-background-accent absolute left-2 top-2 rounded-lg border-[1px] p-1 text-white shadow-lg uppercase">
+            {movie.daysUntilDeletion} days
           </span>
         )}
       </a>
