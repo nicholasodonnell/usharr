@@ -4,6 +4,7 @@ import type { Movie, Rule, Tag } from '@usharr/types'
 
 import { PrismaService } from '../prisma/prisma.service'
 import { RuleService } from '../rule/rule.service'
+import { UtilService } from '../util/util.service'
 
 export type MoviePayload = Required<Pick<Movie, 'id'>> &
   Partial<Omit<Movie, 'id' | 'tags'> & { tags: Pick<Tag, 'id'>[] }>
@@ -46,6 +47,7 @@ export class MovieService {
   constructor(
     private prisma: PrismaService,
     private rule: RuleService,
+    private util: UtilService,
   ) {}
 
   // priv methods //
@@ -92,6 +94,25 @@ export class MovieService {
     }
   }
 
+  private withDaysUntilDeletion(movie: Movie, rule: Rule): Movie {
+    const { downloadedAt, lastWatchedAt } = movie
+    const { downloadedDaysAgo, watchedDaysAgo } = rule
+
+    const daysUntilDeletion = Math.min(
+      downloadedDaysAgo
+        ? downloadedDaysAgo - this.util.daysSince(downloadedAt)
+        : Infinity,
+      watchedDaysAgo && lastWatchedAt
+        ? watchedDaysAgo - this.util.daysSince(lastWatchedAt)
+        : Infinity,
+    )
+
+    return {
+      ...movie,
+      daysUntilDeletion,
+    }
+  }
+
   // public methods //
 
   /**
@@ -118,22 +139,30 @@ export class MovieService {
   async getMonitored(): Promise<Movie[]> {
     try {
       const enabledRules: Rule[] = await this.rule.getEnabled()
-      let monitoredIds = []
+      const moviesMap: Record<number, Movie> = {}
 
       for (const rule of enabledRules) {
-        monitoredIds = [
-          ...monitoredIds,
-          ...(await this.getForRule(rule, true)).map((movie) => movie.id),
-        ]
+        const records: Movie[] = await this.getForRule(rule, true).then(
+          (movies) =>
+            movies.map((movie) => this.withDaysUntilDeletion(movie, rule)),
+        )
+
+        // dedupe movies based on `daysUntilDeletion`
+        for (const record of records) {
+          const { id, daysUntilDeletion } = record
+
+          if (
+            !moviesMap[id] ||
+            moviesMap[id].daysUntilDeletion > daysUntilDeletion
+          ) {
+            moviesMap[id] = record
+          }
+        }
       }
 
-      const where: Prisma.MovieWhereInput = {
-        id: {
-          in: monitoredIds,
-        },
-      }
-
-      return await this.findMany({ where })
+      return Object.values(moviesMap).sort(
+        (a, b) => a.daysUntilDeletion - b.daysUntilDeletion,
+      )
     } catch (e) {
       const error = new Error(`Failed to get monitored movies: ${e.message}`)
       this.logger.error(error.message)
