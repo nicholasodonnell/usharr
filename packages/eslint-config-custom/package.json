@@ -1,6 +1,6 @@
 {
   "name": "@usharr/eslint-config-custom",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.59.11",
