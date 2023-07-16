@@ -105,12 +105,11 @@ export class MovieService {
       watchedDaysAgo && lastWatchedAt
         ? watchedDaysAgo - this.util.daysSince(lastWatchedAt)
         : Infinity,
-      0,
     )
 
     return {
       ...movie,
-      daysUntilDeletion,
+      daysUntilDeletion: daysUntilDeletion === Infinity ? 0 : daysUntilDeletion,
     }
   }
 
