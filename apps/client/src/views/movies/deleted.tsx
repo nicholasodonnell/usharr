@@ -17,7 +17,7 @@ export default function Deleted(): JSX.Element {
       <Title>Movies &#8212; Deleted</Title>
       <Input
         placeholder="Search"
-        className="w-full mb-4"
+        className="mb-4 w-full"
         onChange={setSearch}
         value={search}
       />

@@ -27,7 +27,7 @@ export function TopNav({
       <NavLink
         className={({ isActive }) =>
           cx(
-            'hover:bg-app-background-light flex items-center rounded-lg px-2 py-3 text-xl transition-colors',
+            'flex items-center rounded-lg px-2 py-3 text-xl transition-colors hover:bg-app-background-light',
             {
               'bg-gradient-to-r from-purple to-pink': !children && isActive,
             },
@@ -49,7 +49,7 @@ export function SubNav({ title, to }: NavProps): JSX.Element {
       <NavLink
         className={({ isActive }) =>
           cx(
-            'text-md hover:bg-app-background-light flex items-center rounded-lg px-4 py-3 transition-colors',
+            'text-md flex items-center rounded-lg px-4 py-3 transition-colors hover:bg-app-background-light',
             {
               'bg-gradient-to-r from-purple to-pink': isActive,
             },
@@ -72,7 +72,7 @@ export default function Nav(): JSX.Element {
 
   return (
     <>
-      <div className="bg-app-background border-b-app-background-accent fixed inset-x-0 z-30 flex h-20 w-full items-center border-b px-4 shadow md:hidden">
+      <div className="fixed inset-x-0 z-30 flex h-20 w-full items-center border-b border-b-app-background-accent bg-app-background px-4 shadow md:hidden">
         <button
           className="absolute h-12 w-12 md:hidden"
           type="button"
@@ -85,7 +85,7 @@ export default function Nav(): JSX.Element {
       </div>
       <nav
         className={cx(
-          'bg-app-background border-r-app-background-accent fixed left-0 z-20 mt-20 flex w-full flex-col overflow-hidden border-r-[1px] md:mt-0 md:w-64',
+          'fixed left-0 z-20 mt-20 flex w-full flex-col overflow-hidden border-r-[1px] border-r-app-background-accent bg-app-background md:mt-0 md:w-64',
           {
             'h-screen': mobileNavOpen,
             'h-0 md:h-screen': !mobileNavOpen,

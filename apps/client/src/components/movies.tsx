@@ -25,24 +25,24 @@ export function Movie({ action, movie, onAction }: MovieProps): JSX.Element {
   return (
     <div>
       <a
-        className="bg-app-background border-app-background-accent relative block w-full cursor-pointer overflow-hidden rounded-md border shadow transition-all hover:scale-105 hover:shadow-lg"
+        className="relative block w-full cursor-pointer overflow-hidden rounded-md border border-app-background-accent bg-app-background shadow transition-all hover:scale-105 hover:shadow-lg"
         onClick={() => setModalOpen(true)}>
         <img
-          className="aspect-[2/3] w-full h-full z-10 relative"
+          className="relative z-10 aspect-[2/3] h-full w-full"
           src={movie.poster}
           alt={movie.title}
           loading="lazy"
         />
-        <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-20 text-transparent pointer-events-none">
+        <span className="pointer-events-none absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transform text-center text-transparent">
           {movie.title}
         </span>
         {movie.ignored && (
-          <span className="bg-app-background font-small border-app-background-accent absolute left-2 top-2 rounded-lg border-[1px] p-1 text-white shadow-lg uppercase text-sm z-30">
+          <span className="font-small absolute left-2 top-2 z-30 rounded-lg border-[1px] border-app-background-accent bg-app-background p-1 text-sm uppercase text-white shadow-lg">
             Ignored
           </span>
         )}
         {movie.daysUntilDeletion && movie.daysUntilDeletion !== null && (
-          <span className="bg-red font-small border-app-background-accent absolute left-2 top-2 rounded-lg border-[1px] p-1 text-white shadow-lg uppercase text-sm z-30">
+          <span className="font-small absolute left-2 top-2 z-30 rounded-lg border-[1px] border-app-background-accent bg-red p-1 text-sm uppercase text-white shadow-lg">
             {movie.daysUntilDeletion} day{movie.daysUntilDeletion !== 1 && 's'}
           </span>
         )}
@@ -65,7 +65,7 @@ export function MoviesSkeleton(): JSX.Element {
       {Array.from({ length: 100 }).map((_, index) => (
         <div
           key={index}
-          className="bg-app-background border-app-background-accent flex aspect-[2/3] h-full w-full animate-pulse flex-col items-center justify-center rounded-md border shadow"
+          className="flex aspect-[2/3] h-full w-full animate-pulse flex-col items-center justify-center rounded-md border border-app-background-accent bg-app-background shadow"
         />
       ))}
     </>

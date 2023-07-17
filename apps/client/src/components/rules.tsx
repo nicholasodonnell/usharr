@@ -37,9 +37,9 @@ export function NewRule({
   return (
     <div>
       <a
-        className="flex-center bg-app-background border-app-background-accent flex h-80 w-full cursor-pointer rounded-md border-[1px] border-dashed shadow transition-all hover:border-solid hover:shadow-lg"
+        className="flex-center flex h-80 w-full cursor-pointer rounded-md border-[1px] border-dashed border-app-background-accent bg-app-background shadow transition-all hover:border-solid hover:shadow-lg"
         onClick={() => setModalOpen(true)}>
-        <div className="flex-1 flex flex-row justify-center self-center">
+        <div className="flex flex-1 flex-row justify-center self-center">
           <Plus className="mr-2 h-8 w-8" />
           <H4 className="leading-[32px]">New Rule</H4>
         </div>
@@ -77,7 +77,7 @@ export function Rule({
     <div>
       <a
         className={cx(
-          'bg-app-background border-app-background-accent flex h-80 w-full cursor-pointer items-baseline overflow-hidden rounded-md border-[1px] shadow transition-all hover:border-solid hover:shadow-lg',
+          'flex h-80 w-full cursor-pointer items-baseline overflow-hidden rounded-md border-[1px] border-app-background-accent bg-app-background shadow transition-all hover:border-solid hover:shadow-lg',
           {
             'opacity-50': !rule.enabled,
           },
@@ -192,7 +192,7 @@ export function RulesSkeleton(): JSX.Element {
       {Array.from({ length: 3 }).map((_, index) => (
         <div
           key={index}
-          className="bg-app-background flex h-80 w-full animate-pulse flex-col items-center justify-center rounded-md shadow"
+          className="flex h-80 w-full animate-pulse flex-col items-center justify-center rounded-md bg-app-background shadow"
         />
       ))}
     </>

@@ -49,10 +49,10 @@ export default function MovieModal({
               Deleted On {new Date(movie.deletedAt).toLocaleDateString()}
             </Alert>
           )}
-          <div className="flex w-full flex-row flex-1">
+          <div className="flex w-full flex-1 flex-row">
             <div className="mr-8 w-1/4">
               <img
-                className="border-app-background-accent aspect-[2/3] rounded-md border shadow"
+                className="aspect-[2/3] rounded-md border border-app-background-accent shadow"
                 src={movie.poster}
                 alt={movie.title}
               />
