@@ -128,7 +128,7 @@ export function Label({
     <label className={cx('text-md flex items-center', className)}>
       <span>
         {children}
-        {required && <sup className="text-red ml-1 ">*</sup>}
+        {required && <sup className="ml-1 text-red ">*</sup>}
       </span>
     </label>
   )
@@ -152,7 +152,7 @@ export function Input({
     <input
       autoComplete="off"
       className={cx(
-        'bg-app-background border-app-background-accent focus:border-pink w-full rounded-md border px-4 py-2 text-xl transition-colors focus:outline-none ',
+        'w-full rounded-md border border-app-background-accent bg-app-background px-4 py-2 text-xl transition-colors focus:border-pink focus:outline-none ',
         {
           'pointer-events-none opacity-50': disabled,
         },
@@ -187,7 +187,7 @@ export function NumberInput({
     <input
       autoComplete="off"
       className={cx(
-        'bg-app-background border-app-background-accent focus:border-pink h-12 w-full rounded-md border px-4 py-2 text-xl transition-colors focus:outline-none ',
+        'h-12 w-full rounded-md border border-app-background-accent bg-app-background px-4 py-2 text-xl transition-colors focus:border-pink focus:outline-none ',
         {
           'pointer-events-none opacity-50': disabled,
         },
@@ -222,7 +222,7 @@ export function Select<T>({
     <select
       autoComplete="off"
       className={cx(
-        'bg-app-background border-app-background-accent focus:border-pink h-12 w-full rounded-md border px-4 py-2 text-xl transition-colors focus:outline-none ',
+        'h-12 w-full rounded-md border border-app-background-accent bg-app-background px-4 py-2 text-xl transition-colors focus:border-pink focus:outline-none ',
         {
           'pointer-events-none opacity-50': disabled,
         },
@@ -263,7 +263,7 @@ export function MultipleSelect<T>({
     <select
       autoComplete="off"
       className={cx(
-        'bg-app-background border-app-background-accent focus:border-pink h-52 w-full rounded-md border px-4 py-2 text-xl transition-colors focus:outline-none ',
+        'h-52 w-full rounded-md border border-app-background-accent bg-app-background px-4 py-2 text-xl transition-colors focus:border-pink focus:outline-none ',
         {
           'pointer-events-none opacity-50': disabled,
         },
@@ -303,7 +303,7 @@ export function Checkbox({
       autoComplete="off"
       checked={value}
       className={cx(
-        'border-app-background-accent accent-pink focus:border-pink h-6 w-6 rounded-md border transition-colors focus:outline-none',
+        'h-6 w-6 rounded-md border border-app-background-accent accent-pink transition-colors focus:border-pink focus:outline-none',
         {
           'pointer-events-none opacity-50': disabled,
         },

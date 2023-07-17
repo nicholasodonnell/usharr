@@ -34,8 +34,8 @@ export function Toast({ message, type = 'info' }: ToastModel): JSX.Element {
         {
           'bg-red text-white': type === 'error',
           'bg-purple text-white': type === 'info',
-          'opacity-100 translate-x-0': visible,
-          'opacity-0 translate-x-full': !visible,
+          'translate-x-0 opacity-100': visible,
+          'translate-x-full opacity-0': !visible,
         },
       )}>
       {type === 'info' && <Information className="mr-3 h-8 w-8" />}

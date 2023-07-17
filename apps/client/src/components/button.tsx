@@ -29,7 +29,7 @@ export default function Button({
   return (
     <button
       className={cx(
-        'border-app-background-accent rounded border px-4 py-2 font-bold text-white transition-colors',
+        'rounded border border-app-background-accent px-4 py-2 font-bold text-white transition-colors',
         {
           'bg-purple hover:bg-purple-secondary':
             primary && !secondary && !warning,

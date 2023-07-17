@@ -22,7 +22,7 @@ export function Title({ children, className }: TitleProps): JSX.Element {
   return (
     <H3
       className={cx(
-        'border-app-background-accent mb-5 truncate border-b pb-4',
+        'mb-5 truncate border-b border-app-background-accent pb-4',
         className,
       )}>
       {children}
@@ -35,7 +35,7 @@ export function Description({
   className,
 }: DescriptionProps): JSX.Element {
   return (
-    <P className={cx('text-gray mb-5', className)} italic>
+    <P className={cx('mb-5 text-gray', className)} italic>
       {children}
     </P>
   )

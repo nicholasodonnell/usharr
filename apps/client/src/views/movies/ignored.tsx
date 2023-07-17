@@ -36,7 +36,7 @@ export default function Ignored(): JSX.Element {
       <Title>Movies &#8212; Ignored</Title>
       <Input
         placeholder="Search"
-        className="w-full mb-4"
+        className="mb-4 w-full"
         onChange={setSearch}
         value={search}
       />

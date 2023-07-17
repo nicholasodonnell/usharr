@@ -29,7 +29,7 @@ export default function Monitored(): JSX.Element {
       <Title>Movies &#8212; Monitored</Title>
       <Input
         placeholder="Search"
-        className="w-full mb-4"
+        className="mb-4 w-full"
         onChange={setSearch}
         value={search}
       />

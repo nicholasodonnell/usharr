@@ -28,7 +28,7 @@ export default function Modal({
       />
       <div
         className={cx(
-          'bg-app-background-light border-app-background-accent md:hide-scrollbar fixed left-0 top-24 z-40 m-auto h-5/6 w-full overflow-scroll border-[1px] p-4 shadow-xl transition-all duration-200 md:inset-0 md:h-[fit-content] md:max-h-screen md:max-w-3xl md:overflow-auto md:rounded-md md:p-6',
+          'md:hide-scrollbar fixed left-0 top-24 z-40 m-auto h-5/6 w-full overflow-scroll border-[1px] border-app-background-accent bg-app-background-light p-4 shadow-xl transition-all duration-200 md:inset-0 md:h-[fit-content] md:max-h-screen md:max-w-3xl md:overflow-auto md:rounded-md md:p-6',
           {
             'opacity-0 md:scale-50': !open,
           },
