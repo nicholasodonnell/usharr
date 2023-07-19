@@ -175,9 +175,9 @@ export class SyncService {
             ? Math.floor(radarrMovie.ratings.rottenTomatoes.value)
             : null,
           appearsInList: importlistMoviesTmdbIds.includes(radarrMovie.tmdbId),
-          poster: radarrMovie.images?.find(
-            (image) => image.coverType === 'poster',
-          )?.remoteUrl,
+          poster: radarrMovie.images
+            ?.find((image) => image.coverType === 'poster')
+            ?.remoteUrl?.replace(/original/, 'w500'),
           tags: radarrMovie.tags?.map((tag) => ({ id: tag })) ?? [],
           title: radarrMovie.title,
           deletedAt: null,
