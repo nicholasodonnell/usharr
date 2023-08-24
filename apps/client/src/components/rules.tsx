@@ -176,8 +176,8 @@ export function Rule({
       <RuleModal
         availableTags={availableTags}
         onClose={() => setModalOpen(false)}
-        onSubmit={handleSubmit}
         onDelete={handleDelete}
+        onSubmit={handleSubmit}
         open={modalOpen}
         title="Edit Rule"
         values={rule}

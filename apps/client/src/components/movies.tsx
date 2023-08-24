@@ -50,8 +50,8 @@ export function Movie({ action, movie, onAction }: MovieProps): JSX.Element {
       <MovieModal
         action={action}
         movie={movie}
-        onClose={() => setModalOpen(false)}
         onAction={onAction ? handleAction : null}
+        onClose={() => setModalOpen(false)}
         open={modalOpen}
         title={movie.title}
       />
@@ -65,7 +65,7 @@ export function MoviesSkeleton(): JSX.Element {
       {Array.from({ length: 100 }).map((_, index) => (
         <div
           key={index}
-          className="flex aspect-[2/3] h-full w-full animate-pulse flex-col items-center justify-center rounded-md border border-app-background-accent bg-app-background shadow"
+          className="animate-pulse flex aspect-[2/3] h-full w-full flex-col items-center justify-center rounded-md border border-app-background-accent bg-app-background shadow"
         />
       ))}
     </>
