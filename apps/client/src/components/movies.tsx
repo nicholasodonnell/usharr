@@ -50,8 +50,8 @@ export function Movie({ action, movie, onAction }: MovieProps): JSX.Element {
       <MovieModal
         action={action}
         movie={movie}
-        onClose={() => setModalOpen(false)}
         onAction={onAction ? handleAction : null}
+        onClose={() => setModalOpen(false)}
         open={modalOpen}
         title={movie.title}
       />

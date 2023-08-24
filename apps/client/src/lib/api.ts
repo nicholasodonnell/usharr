@@ -12,7 +12,9 @@ export type API = <T>(Request) => Promise<T>
 
 const request: AxiosInstance = axios.create({
   baseURL:
-    process.env.NODE_ENV === 'production' ? '/' : 'http://localhost:3001',
+    process.env.NODE_ENV === 'production'
+      ? '/'
+      : `http://${window.location.hostname}:3001`,
 })
 
 export default async function api<Data, Response = Data>({
