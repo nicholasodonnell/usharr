@@ -41,11 +41,13 @@ export function Movie({ action, movie, onAction }: MovieProps): JSX.Element {
             Ignored
           </span>
         )}
-        {movie.daysUntilDeletion && movie.daysUntilDeletion !== null && (
-          <span className="font-small absolute left-2 top-2 z-30 rounded-lg border-[1px] border-app-background-accent bg-red p-1 text-sm uppercase text-white shadow-lg">
-            {movie.daysUntilDeletion} day{movie.daysUntilDeletion !== 1 && 's'}
-          </span>
-        )}
+        {movie.daysUntilDeletion !== null &&
+          movie.daysUntilDeletion !== undefined && (
+            <span className="font-small absolute left-2 top-2 z-30 rounded-lg border-[1px] border-app-background-accent bg-red p-1 text-sm uppercase text-white shadow-lg">
+              {movie.daysUntilDeletion} day
+              {movie.daysUntilDeletion !== 1 && 's'}
+            </span>
+          )}
       </a>
       <MovieModal
         action={action}
