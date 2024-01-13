@@ -14,6 +14,7 @@ import { TaskModule } from './task/task.module'
 import { TautulliModule } from './tautulli/tautulli.module'
 
 @Module({
+  controllers: [],
   imports: [
     MovieModule,
     RadarrModule,
@@ -28,7 +29,6 @@ import { TautulliModule } from './tautulli/tautulli.module'
     TaskModule,
     TautulliModule,
   ],
-  controllers: [],
   providers: [],
 })
 export class AppModule {}

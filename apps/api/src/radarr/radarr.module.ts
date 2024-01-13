@@ -6,9 +6,9 @@ import { RadarrController } from './radarr.controller'
 import { RadarrService } from './radarr.service'
 
 @Module({
-  imports: [SettingsModule],
   controllers: [RadarrController],
-  providers: [RadarrService],
   exports: [RadarrService],
+  imports: [SettingsModule],
+  providers: [RadarrService],
 })
 export class RadarrModule {}

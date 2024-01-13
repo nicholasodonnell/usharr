@@ -6,7 +6,7 @@ import type {
   TautulliSettings,
 } from '@usharr/types'
 
-import { PrismaService } from '../prisma/prisma.service'
+import { PrismaService } from '../prisma.service'
 
 const generalSettingsSelect: Prisma.SettingsSelect = {
   enabled: true,
@@ -14,45 +14,57 @@ const generalSettingsSelect: Prisma.SettingsSelect = {
   syncHour: true,
 }
 const radarrSettingsSelect: Prisma.SettingsSelect = {
-  radarrUrl: true,
   radarrApiKey: true,
+  radarrUrl: true,
 }
 const tautulliSettingsSelect: Prisma.SettingsSelect = {
-  tautulliUrl: true,
-  tautulliApiKey: true,
   tautlliLibraryIds: true,
+  tautulliApiKey: true,
+  tautulliUrl: true,
 }
 
 @Injectable()
 export class SettingsService implements OnModuleInit {
-  private readonly logger = new Logger(SettingsService.name)
   private readonly id = 1
+  private readonly logger = new Logger(SettingsService.name)
 
   constructor(private prisma: PrismaService) {}
 
   // module methods //
 
-  async onModuleInit() {
-    await this.prisma.settings.upsert({
+  private async findFirst<T>(select: Prisma.SettingsSelect): Promise<T> {
+    return this.prisma.settings.findFirst({
+      select,
       where: { id: this.id },
-      create: { id: this.id },
-      update: {},
-    })
+    }) as T
   }
 
   // priv methods //
 
   private serializeTautulliRecord(record): TautulliSettings {
-    const { tautulliUrl, tautulliApiKey, tautlliLibraryIds } = record
+    const { tautlliLibraryIds, tautulliApiKey, tautulliUrl } = record
 
     return {
-      tautulliUrl,
-      tautulliApiKey,
       tautlliLibraryIds: tautlliLibraryIds?.split(',').map(Number) ?? [],
+      tautulliApiKey,
+      tautulliUrl,
     }
   }
 
   // public methods //
+
+  private async update<T>(params: {
+    select: Prisma.SettingsSelect
+    update: Prisma.SettingsUpdateInput
+  }): Promise<T> {
+    const { select, update } = params
+
+    return this.prisma.settings.update({
+      data: update,
+      select,
+      where: { id: this.id },
+    }) as T
+  }
 
   /**
    * Get general settings
@@ -69,26 +81,6 @@ export class SettingsService implements OnModuleInit {
   }
 
   /**
-   * Update general settings
-   */
-  async updateGeneral(settings: GeneralSettings): Promise<GeneralSettings> {
-    try {
-      const { enabled, syncDays, syncHour } = settings
-      const data = { enabled, syncDays, syncHour }
-
-      return this.update<GeneralSettings>({
-        update: data,
-        select: generalSettingsSelect,
-      })
-    } catch (e) {
-      const error = new Error(`Failed to update general settings: ${e.message}`)
-      this.logger.error(error.message)
-
-      throw error
-    }
-  }
-
-  /**
    * Update Radarr settings
    */
   async getRadarr(): Promise<RadarrSettings> {
@@ -96,26 +88,6 @@ export class SettingsService implements OnModuleInit {
       return this.findFirst<RadarrSettings>(radarrSettingsSelect)
     } catch (e) {
       const error = new Error(`Failed to get radarr settings: ${e.message}`)
-      this.logger.error(error.message)
-
-      throw error
-    }
-  }
-
-  /**
-   * Update Radarr settings
-   */
-  async updateRadarr(settings: RadarrSettings): Promise<RadarrSettings> {
-    try {
-      const { radarrUrl, radarrApiKey } = settings
-      const data = { radarrUrl, radarrApiKey }
-
-      return this.update<RadarrSettings>({
-        update: data,
-        select: radarrSettingsSelect,
-      })
-    } catch (e) {
-      const error = new Error(`Failed to update radarr settings: ${e.message}`)
       this.logger.error(error.message)
 
       throw error
@@ -140,21 +112,71 @@ export class SettingsService implements OnModuleInit {
     }
   }
 
+  async onModuleInit() {
+    await this.prisma.settings.upsert({
+      create: { id: this.id },
+      update: {},
+      where: { id: this.id },
+    })
+  }
+
+  /**
+   * Update general settings
+   */
+  async updateGeneral(settings: GeneralSettings): Promise<GeneralSettings> {
+    try {
+      const { enabled, syncDays, syncHour } = settings
+      const data = { enabled, syncDays, syncHour }
+
+      return this.update<GeneralSettings>({
+        select: generalSettingsSelect,
+        update: data,
+      })
+    } catch (e) {
+      const error = new Error(`Failed to update general settings: ${e.message}`)
+      this.logger.error(error.message)
+
+      throw error
+    }
+  }
+
+  // database methods //
+
+  /**
+   * Update Radarr settings
+   */
+  async updateRadarr(settings: RadarrSettings): Promise<RadarrSettings> {
+    try {
+      const { radarrApiKey, radarrUrl } = settings
+      const data = { radarrApiKey, radarrUrl }
+
+      return this.update<RadarrSettings>({
+        select: radarrSettingsSelect,
+        update: data,
+      })
+    } catch (e) {
+      const error = new Error(`Failed to update radarr settings: ${e.message}`)
+      this.logger.error(error.message)
+
+      throw error
+    }
+  }
+
   /**
    * Update Tautulli settings
    */
   async updateTautulli(settings: TautulliSettings): Promise<TautulliSettings> {
     try {
-      const { tautulliUrl, tautulliApiKey, tautlliLibraryIds } = settings
+      const { tautlliLibraryIds, tautulliApiKey, tautulliUrl } = settings
       const data = {
-        tautulliUrl,
-        tautulliApiKey,
         tautlliLibraryIds: tautlliLibraryIds?.join(',') ?? undefined,
+        tautulliApiKey,
+        tautulliUrl,
       }
 
       return this.update<TautulliSettings>({
-        update: data,
         select: tautulliSettingsSelect,
+        update: data,
       })
     } catch (e) {
       const error = new Error(
@@ -164,27 +186,5 @@ export class SettingsService implements OnModuleInit {
 
       throw error
     }
-  }
-
-  // database methods //
-
-  private async findFirst<T>(select: Prisma.SettingsSelect): Promise<T> {
-    return this.prisma.settings.findFirst({
-      where: { id: this.id },
-      select,
-    }) as T
-  }
-
-  private async update<T>(params: {
-    update: Prisma.SettingsUpdateInput
-    select: Prisma.SettingsSelect
-  }): Promise<T> {
-    const { update, select } = params
-
-    return this.prisma.settings.update({
-      where: { id: this.id },
-      data: update,
-      select,
-    }) as T
   }
 }

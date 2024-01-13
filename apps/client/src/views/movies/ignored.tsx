@@ -9,8 +9,8 @@ import { useToast } from '../../hooks/useToast'
 
 export default function Ignored(): JSX.Element {
   const {
-    fetch,
     data: movies,
+    fetch,
     loading,
   } = useFetch<MovieModel[]>('/api/movies/ignored')
   const { mutate } = useMutate<MovieModel>('/api/movies/:id')
@@ -35,9 +35,9 @@ export default function Ignored(): JSX.Element {
     <Section>
       <Title>Movies &#8212; Ignored</Title>
       <Input
-        placeholder="Search"
         className="mb-4 w-full"
         onChange={setSearch}
+        placeholder="Search"
         value={search}
       />
       <Movies loading={loading}>
@@ -49,10 +49,10 @@ export default function Ignored(): JSX.Element {
           )
           ?.map((movie) => (
             <Movie
-              key={movie.id}
               action={movie.ignored ? 'Monitor' : 'Always Ignore'}
-              onAction={movie.ignored ? handleMonitor : handleIgnore}
+              key={movie.id}
               movie={movie}
+              onAction={movie.ignored ? handleMonitor : handleIgnore}
             />
           ))}
       </Movies>

@@ -2,12 +2,14 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
+    'plugin:perfectionist/recommended-natural',
     'prettier',
   ],
   parser: '@typescript-eslint/parser',
   plugins: [
     '@typescript-eslint/eslint-plugin',
     'import',
+    'perfectionist',
     'prettier',
   ],
   root: true,
@@ -48,6 +50,7 @@ module.exports = {
     ],
     'no-unused-expressions': 2,
     'object-curly-spacing': [ 'error', 'always' ],
+    'perfectionist/sort-imports': 'off',
     'prettier/prettier': ['error'],
     'quotes': [ 'error', 'single', { 'allowTemplateLiterals': true } ],
     'semi': [ 'error', 'never' ],

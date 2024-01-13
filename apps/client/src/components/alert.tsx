@@ -21,8 +21,8 @@ export default function Alert({
       className={cx(
         'flex w-full flex-row rounded px-4 py-2',
         {
-          'bg-red text-white': error || (!error && !warning),
           'bg-orange text-black': warning,
+          'bg-red text-white': error || (!error && !warning),
         },
         className,
       )}>

@@ -2,10 +2,10 @@ import axios from 'axios'
 import type { AxiosInstance, AxiosResponse, Method } from 'axios'
 
 export type Request<Data> = {
-  url: string
-  params?: Record<string, unknown>
   data?: Data
   method?: Method
+  params?: Record<string, unknown>
+  url: string
 }
 
 export type API = <T>(Request) => Promise<T>

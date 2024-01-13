@@ -4,8 +4,12 @@ module.exports = {
     './src/**/*.{js,ts,jsx,tsx}',
     '../../packages/ui/**/*.{js,ts,jsx,tsx}',
   ],
+  plugins: [],
   theme: {
     colors: {
+      'app-background': 'var(--app-background)',
+      'app-background-accent': 'var(--app-background-accent)',
+      'app-background-light': 'var(--app-background-light)',
       black: '#000',
       'black-secondary': '#21222c',
       cyan: '#80ffea',
@@ -21,13 +25,9 @@ module.exports = {
       white: '#fff',
       'white-secondary': '#f8f8f2',
       yellow: '#f1fa8c',
-      'app-background': 'var(--app-background)',
-      'app-background-light': 'var(--app-background-light)',
-      'app-background-accent': 'var(--app-background-accent)',
     },
     fontFamily: {
       mono: ['Fira Code', 'monospace'],
     },
   },
-  plugins: [],
 }

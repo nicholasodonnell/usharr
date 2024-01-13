@@ -1,9 +1,9 @@
 import {
+  CallHandler,
+  ExecutionContext,
+  HttpException,
   Injectable,
   NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-  HttpException,
 } from '@nestjs/common'
 import { Request } from 'express'
 import { Observable, throwError } from 'rxjs'
@@ -21,8 +21,8 @@ export class ErrorInterceptor implements NestInterceptor {
             new HttpException(
               {
                 message: e?.message || 'Something went wrong',
-                route: request.path,
                 method: request.method,
+                route: request.path,
               },
               e?.statusCode ?? 500,
             ),

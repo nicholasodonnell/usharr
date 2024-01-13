@@ -6,16 +6,16 @@ import { SyncService } from './sync.service'
 export class SyncController {
   constructor(private readonly sync: SyncService) {}
 
-  @Post('partial')
-  @HttpCode(202)
-  async partial(): Promise<void> {
-    await this.sync.partial()
-  }
-
   @Post('full')
   @HttpCode(202)
   async full(): Promise<void> {
     await this.sync.full()
+  }
+
+  @Post('partial')
+  @HttpCode(202)
+  async partial(): Promise<void> {
+    await this.sync.partial()
   }
 
   @Post('radarr')

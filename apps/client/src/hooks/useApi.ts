@@ -5,21 +5,21 @@ import api from '../lib/api'
 import { useToast } from './useToast'
 
 export type UseFetch<Response> = {
+  data: Response
   fetch: () => Promise<Response>
   loading: boolean
-  data: Response
 }
 
 export type UseCreate<Data, Response> = {
   create: (data?: Data) => Promise<Response>
-  loading: boolean
   data: Response
+  loading: boolean
 }
 
 export type UseMutate<Data, Response> = {
-  mutate: (id: number, data?: Data) => Promise<Response>
-  loading: boolean
   data: Response
+  loading: boolean
+  mutate: (id: number, data?: Data) => Promise<Response>
 }
 
 export type UseDestroy = {
@@ -52,7 +52,7 @@ export function useFetch<Response>(url: string): UseFetch<Response> {
     fetch()
   }, [fetch])
 
-  return { fetch, loading, data }
+  return { data, fetch, loading }
 }
 
 export function useCreate<Data, Response = Data>(
@@ -86,7 +86,7 @@ export function useCreate<Data, Response = Data>(
     [addToast, url],
   )
 
-  return { create, loading, data }
+  return { create, data, loading }
 }
 
 export function useMutate<Data, Response = Data>(
@@ -120,7 +120,7 @@ export function useMutate<Data, Response = Data>(
     [addToast, url],
   )
 
-  return { mutate, loading, data }
+  return { data, loading, mutate }
 }
 
 export function useDestroy(url: string): UseDestroy {

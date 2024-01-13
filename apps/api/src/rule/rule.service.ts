@@ -2,23 +2,21 @@ import { Injectable, Logger } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import type { Rule, Tag } from '@usharr/types'
 
-import { PrismaService } from '../prisma/prisma.service'
+import { PrismaService } from '../prisma.service'
 
 export type RulePayload = Pick<Rule, 'id'> &
   Omit<Rule, 'id' | 'tags'> & { tags: Pick<Tag, 'id'>[] }
 
 const select: Prisma.RuleSelect = {
-  id: true,
-  name: true,
-  enabled: true,
-  downloadedDaysAgo: true,
-  watched: true,
-  watchedDaysAgo: true,
   appearsInList: true,
+  downloadedDaysAgo: true,
+  enabled: true,
+  id: true,
   minimumImdbRating: true,
-  minimumTmdbRating: true,
   minimumMetacriticRating: true,
   minimumRottenTomatoesRating: true,
+  minimumTmdbRating: true,
+  name: true,
   tags: {
     select: {
       tag: {
@@ -29,6 +27,8 @@ const select: Prisma.RuleSelect = {
       },
     },
   },
+  watched: true,
+  watchedDaysAgo: true,
 }
 
 @Injectable()
@@ -39,170 +39,13 @@ export class RuleService {
 
   // priv methods //
 
-  private serializeRecord(record): Rule {
-    const {
-      id,
-      name,
-      enabled,
-      downloadedDaysAgo,
-      watched,
-      watchedDaysAgo,
-      appearsInList,
-      minimumImdbRating,
-      minimumTmdbRating,
-      minimumMetacriticRating,
-      minimumRottenTomatoesRating,
-      tags = [],
-    } = record
-
-    return {
-      id,
-      name,
-      enabled,
-      downloadedDaysAgo,
-      watched,
-      watchedDaysAgo,
-      appearsInList,
-      minimumImdbRating,
-      minimumTmdbRating,
-      minimumMetacriticRating,
-      minimumRottenTomatoesRating,
-      tags: tags.map((tag) => tag.tag),
-    }
+  private async delete(where: Prisma.RuleWhereUniqueInput) {
+    await this.prisma.rule.delete({
+      where,
+    })
   }
 
   // public methods //
-
-  /**
-   * Returns a list of all rules
-   */
-  async getAll(): Promise<Rule[]> {
-    try {
-      return await this.findMany()
-    } catch (e) {
-      const error = new Error(`Failed to get all rules: ${e.message}`)
-      this.logger.error(error)
-
-      throw error
-    }
-  }
-
-  /**
-   * Returns a list of enabled rules
-   */
-  async getEnabled(): Promise<Rule[]> {
-    try {
-      return await this.findMany({ where: { enabled: true } })
-    } catch (e) {
-      const error = new Error(`Failed to get enabled rules: ${e.message}`)
-      this.logger.error(error)
-
-      throw error
-    }
-  }
-
-  /**
-   * Create a new rule record if one does not exist, otherwise update the existing record
-   */
-  async createOrUpdate(rule: RulePayload): Promise<Rule> {
-    try {
-      const {
-        id,
-        name,
-        enabled,
-        downloadedDaysAgo,
-        watched,
-        watchedDaysAgo,
-        appearsInList,
-        minimumImdbRating,
-        minimumTmdbRating,
-        minimumMetacriticRating,
-        minimumRottenTomatoesRating,
-        tags,
-      } = rule
-
-      const data = {
-        name,
-        enabled,
-        downloadedDaysAgo,
-        watched,
-        watchedDaysAgo: watched ? watchedDaysAgo : null,
-        appearsInList,
-        minimumImdbRating,
-        minimumTmdbRating,
-        minimumMetacriticRating,
-        minimumRottenTomatoesRating,
-        tags: tags
-          ? {
-              create: tags.map((tag) => ({
-                tag: {
-                  connect: {
-                    id: tag.id,
-                  },
-                },
-              })),
-            }
-          : undefined,
-      }
-
-      return await this.upsert({
-        create: data,
-        update: data,
-        where: { id: id ?? -1 },
-      })
-    } catch (e) {
-      const error = new Error(`Failed to create or update rule: ${e.message}`)
-      this.logger.error(error)
-
-      throw error
-    }
-  }
-
-  /**
-   * Delete a rule by id
-   */
-  async deleteById(id: number): Promise<void> {
-    try {
-      await this.delete({ id })
-    } catch (e) {
-      const error = new Error(`Failed to delete rule: ${e.message}`)
-      this.logger.error(error)
-
-      throw error
-    }
-  }
-
-  /**
-   * Disable rules that have tags but do not have any of the provided tag ids associated with them
-   */
-  async disableWhereNotTagIds(ids: number[]): Promise<void> {
-    try {
-      await this.updateMany({
-        data: { enabled: false },
-        where: {
-          tags: {
-            some: {},
-          },
-          AND: {
-            tags: {
-              none: {
-                tagId: {
-                  in: ids,
-                },
-              },
-            },
-          },
-        },
-      })
-    } catch (e) {
-      const error = new Error(`Failed to disable rules: ${e.message}`)
-      this.logger.error(error)
-
-      throw error
-    }
-  }
-
-  // database methods //
 
   private async findMany(
     params: {
@@ -223,6 +66,38 @@ export class RuleService {
     })
 
     return records.map(this.serializeRecord)
+  }
+
+  private serializeRecord(record): Rule {
+    const {
+      appearsInList,
+      downloadedDaysAgo,
+      enabled,
+      id,
+      minimumImdbRating,
+      minimumMetacriticRating,
+      minimumRottenTomatoesRating,
+      minimumTmdbRating,
+      name,
+      tags = [],
+      watched,
+      watchedDaysAgo,
+    } = record
+
+    return {
+      appearsInList,
+      downloadedDaysAgo,
+      enabled,
+      id,
+      minimumImdbRating,
+      minimumMetacriticRating,
+      minimumRottenTomatoesRating,
+      minimumTmdbRating,
+      name,
+      tags: tags.map((tag) => tag.tag),
+      watched,
+      watchedDaysAgo,
+    }
   }
 
   private async updateMany(params: {
@@ -266,9 +141,134 @@ export class RuleService {
     })
   }
 
-  private async delete(where: Prisma.RuleWhereUniqueInput) {
-    await this.prisma.rule.delete({
-      where,
-    })
+  /**
+   * Create a new rule record if one does not exist, otherwise update the existing record
+   */
+  async createOrUpdate(rule: RulePayload): Promise<Rule> {
+    try {
+      const {
+        appearsInList,
+        downloadedDaysAgo,
+        enabled,
+        id,
+        minimumImdbRating,
+        minimumMetacriticRating,
+        minimumRottenTomatoesRating,
+        minimumTmdbRating,
+        name,
+        tags,
+        watched,
+        watchedDaysAgo,
+      } = rule
+
+      const data = {
+        appearsInList,
+        downloadedDaysAgo,
+        enabled,
+        minimumImdbRating,
+        minimumMetacriticRating,
+        minimumRottenTomatoesRating,
+        minimumTmdbRating,
+        name,
+        tags: tags
+          ? {
+              create: tags.map((tag) => ({
+                tag: {
+                  connect: {
+                    id: tag.id,
+                  },
+                },
+              })),
+            }
+          : undefined,
+        watched,
+        watchedDaysAgo: watched ? watchedDaysAgo : null,
+      }
+
+      return await this.upsert({
+        create: data,
+        update: data,
+        where: { id: id ?? -1 },
+      })
+    } catch (e) {
+      const error = new Error(`Failed to create or update rule: ${e.message}`)
+      this.logger.error(error)
+
+      throw error
+    }
+  }
+
+  // database methods //
+
+  /**
+   * Delete a rule by id
+   */
+  async deleteById(id: number): Promise<void> {
+    try {
+      await this.delete({ id })
+    } catch (e) {
+      const error = new Error(`Failed to delete rule: ${e.message}`)
+      this.logger.error(error)
+
+      throw error
+    }
+  }
+
+  /**
+   * Disable rules that have tags but do not have any of the provided tag ids associated with them
+   */
+  async disableWhereNotTagIds(ids: number[]): Promise<void> {
+    try {
+      await this.updateMany({
+        data: { enabled: false },
+        where: {
+          AND: {
+            tags: {
+              none: {
+                tagId: {
+                  in: ids,
+                },
+              },
+            },
+          },
+          tags: {
+            some: {},
+          },
+        },
+      })
+    } catch (e) {
+      const error = new Error(`Failed to disable rules: ${e.message}`)
+      this.logger.error(error)
+
+      throw error
+    }
+  }
+
+  /**
+   * Returns a list of all rules
+   */
+  async getAll(): Promise<Rule[]> {
+    try {
+      return await this.findMany()
+    } catch (e) {
+      const error = new Error(`Failed to get all rules: ${e.message}`)
+      this.logger.error(error)
+
+      throw error
+    }
+  }
+
+  /**
+   * Returns a list of enabled rules
+   */
+  async getEnabled(): Promise<Rule[]> {
+    try {
+      return await this.findMany({ where: { enabled: true } })
+    } catch (e) {
+      const error = new Error(`Failed to get enabled rules: ${e.message}`)
+      this.logger.error(error)
+
+      throw error
+    }
   }
 }

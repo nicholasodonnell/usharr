@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import type { Tag } from '@usharr/types'
 
-import { PrismaService } from '../prisma/prisma.service'
+import { PrismaService } from '../prisma.service'
 
 export type TagPayload = Required<Pick<Tag, 'id'>> & Partial<Omit<Tag, 'id'>>
 
@@ -19,6 +19,35 @@ export class TagService {
 
   // priv methods //
 
+  private async deleteMany(where: Prisma.TagWhereInput): Promise<void> {
+    await this.prisma.tag.deleteMany({
+      where,
+    })
+  }
+
+  // public methods //
+
+  private async findMany(
+    params: {
+      orderBy?: Prisma.TagOrderByWithRelationInput
+      skip?: number
+      take?: number
+      where?: Prisma.TagWhereInput
+    } = {},
+  ): Promise<Tag[]> {
+    const { orderBy, skip, take, where } = params
+
+    const records = await this.prisma.tag.findMany({
+      orderBy,
+      select,
+      skip,
+      take,
+      where,
+    })
+
+    return records.map(this.serializeRecord)
+  }
+
   private serializeRecord(record): Tag {
     return {
       id: record.id,
@@ -26,21 +55,25 @@ export class TagService {
     }
   }
 
-  // public methods //
+  private async upsert(params: {
+    create: Prisma.TagCreateInput
+    select?: Prisma.TagSelect
+    update: Prisma.TagUpdateInput
+    where: Prisma.TagWhereUniqueInput
+  }): Promise<Tag> {
+    const { create, update, where } = params
 
-  /**
-   * Returns a list of all tags
-   */
-  async getAll(): Promise<Tag[]> {
-    try {
-      return await this.findMany()
-    } catch (e) {
-      const error = new Error(`Failed to get all tags: ${e.message}`)
-      this.logger.error(error)
+    const record = await this.prisma.tag.upsert({
+      create,
+      select,
+      update,
+      where,
+    })
 
-      throw error
-    }
+    return this.serializeRecord(record)
   }
+
+  // database methods //
 
   /**
    * Create a new tag record if one does not exist, otherwise update the existing record
@@ -84,50 +117,17 @@ export class TagService {
     }
   }
 
-  // database methods //
+  /**
+   * Returns a list of all tags
+   */
+  async getAll(): Promise<Tag[]> {
+    try {
+      return await this.findMany()
+    } catch (e) {
+      const error = new Error(`Failed to get all tags: ${e.message}`)
+      this.logger.error(error)
 
-  private async findMany(
-    params: {
-      orderBy?: Prisma.TagOrderByWithRelationInput
-      skip?: number
-      take?: number
-      where?: Prisma.TagWhereInput
-    } = {},
-  ): Promise<Tag[]> {
-    const { orderBy, skip, take, where } = params
-
-    const records = await this.prisma.tag.findMany({
-      orderBy,
-      select,
-      skip,
-      take,
-      where,
-    })
-
-    return records.map(this.serializeRecord)
-  }
-
-  private async deleteMany(where: Prisma.TagWhereInput): Promise<void> {
-    await this.prisma.tag.deleteMany({
-      where,
-    })
-  }
-
-  private async upsert(params: {
-    create: Prisma.TagCreateInput
-    select?: Prisma.TagSelect
-    update: Prisma.TagUpdateInput
-    where: Prisma.TagWhereUniqueInput
-  }): Promise<Tag> {
-    const { create, update, where } = params
-
-    const record = await this.prisma.tag.upsert({
-      create,
-      select,
-      update,
-      where,
-    })
-
-    return this.serializeRecord(record)
+      throw error
+    }
   }
 }

@@ -7,7 +7,7 @@ import { useCreate, useDestroy, useFetch, useMutate } from '../../hooks/useApi'
 import { useToast } from '../../hooks/useToast'
 
 export default function Index(): JSX.Element {
-  const { fetch, data: rules, loading } = useFetch<RuleModel[]>('/api/rules')
+  const { data: rules, fetch, loading } = useFetch<RuleModel[]>('/api/rules')
   const { data: tags, loading: tagsLoading } = useFetch<Tag[]>('/api/tags')
   const { create } = useCreate<RuleModel>('/api/rules')
   const { mutate } = useMutate<RuleModel>('/api/rules/:id')
@@ -41,10 +41,10 @@ export default function Index(): JSX.Element {
       <Rules loading={loading || tagsLoading}>
         {rules?.map((rule) => (
           <Rule
-            key={rule.id}
             availableTags={tags}
-            onSubmit={handleEdit}
+            key={rule.id}
             onDelete={handleDelete}
+            onSubmit={handleEdit}
             rule={rule}
           />
         ))}

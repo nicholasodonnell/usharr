@@ -28,20 +28,20 @@ export type GenericInputProps = {
 
 export type InputProps = GenericInputProps & {
   onChange: (value: string) => void
-  type?: 'text' | 'password'
-  value: string | null
+  type?: 'password' | 'text'
+  value: null | string
 }
 
 export type NumberInputProps = GenericInputProps & {
   max?: number
   min?: number
   onChange: (value: number) => void
-  value: number | null
+  value: null | number
 }
 
 export type LabelPros = {
-  className?: string
   children: React.ReactNode
+  className?: string
   required?: boolean
 }
 
@@ -120,8 +120,8 @@ export function Actions({ children, className }: ActionsProps): JSX.Element {
 }
 
 export function Label({
-  className,
   children,
+  className,
   required = false,
 }: LabelPros): JSX.Element {
   return (
@@ -291,8 +291,8 @@ export function Checkbox({
   className,
   disabled = false,
   onChange,
-  value = false,
   required = false,
+  value = false,
 }: CheckboxProps): JSX.Element {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     onChange(event.target.checked)

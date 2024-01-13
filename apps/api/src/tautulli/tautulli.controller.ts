@@ -7,13 +7,13 @@ import { TautulliService } from './tautulli.service'
 export class TautulliController {
   constructor(private readonly tautulli: TautulliService) {}
 
-  @Post('ping')
-  async postPing(@Body() body: TautulliSettings): Promise<TautulliPing> {
-    return await this.tautulli.ping(body)
-  }
-
   @Get('ping')
   async getPing(): Promise<TautulliPing> {
     return await this.tautulli.ping()
+  }
+
+  @Post('ping')
+  async postPing(@Body() body: TautulliSettings): Promise<TautulliPing> {
+    return await this.tautulli.ping(body)
   }
 }

@@ -12,9 +12,9 @@ export class MovieController {
     return this.movie.getAll()
   }
 
-  @Get('monitored')
-  async getMonitored(): Promise<Movie[]> {
-    return this.movie.getMonitored()
+  @Get('deleted')
+  async getDeleted(): Promise<Movie[]> {
+    return this.movie.getDeleted()
   }
 
   @Get('ignored')
@@ -22,9 +22,9 @@ export class MovieController {
     return this.movie.getIgnored()
   }
 
-  @Get('deleted')
-  async getDeleted(): Promise<Movie[]> {
-    return this.movie.getDeleted()
+  @Get('monitored')
+  async getMonitored(): Promise<Movie[]> {
+    return this.movie.getMonitored()
   }
 
   @Put(':id')

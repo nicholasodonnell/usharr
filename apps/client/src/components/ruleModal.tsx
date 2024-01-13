@@ -14,13 +14,13 @@ import {
   Select,
 } from './form'
 import Modal from './modal'
-import Section, { Title, Description } from './section'
+import Section, { Description, Title } from './section'
 
 export type RuleModalProps = {
   availableTags: Tag[]
   onClose: () => void
-  onSubmit: (rule: Rule) => Promise<void>
   onDelete?: (rule: Rule) => Promise<void>
+  onSubmit: (rule: Rule) => Promise<void>
   open: boolean
   title: string
   values?: Rule
@@ -92,12 +92,12 @@ export default function RuleModal({
             <Label className="col-span-1">Watched</Label>
             <Select<boolean>
               className="col-span-3"
+              onChange={setProperty('watched')}
               options={[
                 { label: '', value: null },
                 { label: 'Yes', value: true },
                 { label: 'No', value: false },
               ]}
-              onChange={setProperty('watched')}
               value={rule?.watched}
             />
           </Field>
@@ -115,12 +115,12 @@ export default function RuleModal({
             <Label className="col-span-1">In Radarr List</Label>
             <Select<boolean>
               className="col-span-3"
+              onChange={setProperty('appearsInList')}
               options={[
                 { label: '', value: null },
                 { label: 'Yes', value: true },
                 { label: 'No', value: false },
               ]}
-              onChange={setProperty('appearsInList')}
               value={rule?.appearsInList}
             />
           </Field>
@@ -172,11 +172,11 @@ export default function RuleModal({
             <Label className="col-span-1">Radarr Tags</Label>
             <MultipleSelect<Tag | null>
               className="col-span-3"
+              onChange={setProperty('tags')}
               options={availableTags.map((tag: Tag) => ({
                 label: tag.name,
                 value: tag,
               }))}
-              onChange={setProperty('tags')}
               values={rule?.tags}
             />
           </Field>

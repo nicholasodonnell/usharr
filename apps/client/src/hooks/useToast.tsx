@@ -13,8 +13,8 @@ export type ToastProviderProps = {
 }
 
 export type ToastProvider = {
-  toasts: Toast[]
   addToast: (toast: Toast) => void
+  toasts: Toast[]
 }
 
 export const ToastProvider = ({ children }: ToastProviderProps) => {
@@ -26,7 +26,7 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
   }, [])
 
   return (
-    <ToastContext.Provider value={{ toasts, addToast: handleAddToast }}>
+    <ToastContext.Provider value={{ addToast: handleAddToast, toasts }}>
       {children}
     </ToastContext.Provider>
   )

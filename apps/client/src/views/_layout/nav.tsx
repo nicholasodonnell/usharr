@@ -75,8 +75,8 @@ export default function Nav(): JSX.Element {
       <div className="fixed inset-x-0 z-30 flex h-20 w-full items-center border-b border-b-app-background-accent bg-app-background px-4 shadow md:hidden">
         <button
           className="absolute h-12 w-12 md:hidden"
-          type="button"
-          onClick={() => setMobileNavOpen(!mobileNavOpen)}>
+          onClick={() => setMobileNavOpen(!mobileNavOpen)}
+          type="button">
           <Bars />
         </button>
         <NavLink className="mx-auto w-40" to="/">
@@ -87,8 +87,8 @@ export default function Nav(): JSX.Element {
         className={cx(
           'fixed left-0 z-20 mt-20 flex w-full flex-col overflow-hidden border-r-[1px] border-r-app-background-accent bg-app-background md:mt-0 md:w-64',
           {
-            'h-screen': mobileNavOpen,
             'h-0 md:h-screen': !mobileNavOpen,
+            'h-screen': mobileNavOpen,
           },
         )}>
         <div className="p-4 md:py-8">
