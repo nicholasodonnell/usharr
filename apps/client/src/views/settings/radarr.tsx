@@ -1,4 +1,8 @@
-import type { RadarrPing, RadarrSettings } from '@usharr/types'
+import type {
+  RadarrPing,
+  RadarrSettings,
+  RadarrSettingsDTO,
+} from '@usharr/types'
 import React from 'react'
 
 import Alert from '../../components/alert'
@@ -14,8 +18,8 @@ export default function Radarr(): JSX.Element {
     useFetch<RadarrSettings>('/api/settings/radarr')
   const { data: pingData, loading: pingLoading } =
     useFetch<RadarrPing>('/api/radarr/ping')
-  const { create } = useCreate<RadarrSettings>('/api/settings/radarr')
-  const { create: postPing } = useCreate<RadarrSettings, RadarrPing>(
+  const { create } = useCreate<RadarrSettingsDTO>('/api/settings/radarr')
+  const { create: postPing } = useCreate<RadarrSettingsDTO, RadarrPing>(
     '/api/radarr/ping',
   )
   const { create: radarrSync } = useCreate('/api/sync/radarr')

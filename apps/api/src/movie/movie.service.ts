@@ -1,55 +1,57 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
-import type { Movie, Rule, Tag } from '@usharr/types'
 
 import { PrismaService } from '../prisma.service'
+import { Rule } from '../rule/rule.model'
 import { RuleService } from '../rule/rule.service'
+import { Tag } from '../tag/tag.model'
 import { daysSince } from '../util/daysSince'
 
-export type MoviePayload = Required<Pick<Movie, 'id'>> &
-  Partial<Omit<Movie, 'id' | 'tags'> & { tags: Pick<Tag, 'id'>[] }>
+import { MovieDTO } from './movie.dto'
+import { Movie } from './movie.model'
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000
-
-const select: Prisma.MovieSelect = {
-  alternativeTitles: true,
-  appearsInList: true,
-  deleted: true,
-  deletedAt: true,
-  downloadedAt: true,
-  id: true,
-  ignored: true,
-  imdbRating: true,
-  lastWatchedAt: true,
-  metacriticRating: true,
-  poster: true,
-  rottenTomatoesRating: true,
-  tags: {
-    select: {
-      tag: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
-  },
-  title: true,
-  tmdbId: true,
-  tmdbRating: true,
-  watched: true,
-}
 
 @Injectable()
 export class MovieService {
   private readonly logger = new Logger(MovieService.name)
 
+  readonly select: Prisma.MovieSelect = {
+    alternativeTitles: true,
+    appearsInList: true,
+    createdAt: true,
+    deleted: true,
+    deletedAt: true,
+    downloadedAt: true,
+    id: true,
+    ignored: true,
+    imdbRating: true,
+    lastWatchedAt: true,
+    metacriticRating: true,
+    poster: true,
+    rottenTomatoesRating: true,
+    tags: {
+      select: {
+        tag: {
+          select: {
+            createdAt: true,
+            id: true,
+            name: true,
+            updatedAt: true,
+          },
+        },
+      },
+    },
+    title: true,
+    tmdbId: true,
+    tmdbRating: true,
+    watched: true,
+  }
+
   constructor(
     private prisma: PrismaService,
     private rule: RuleService,
   ) {}
-
-  // priv methods //
 
   private async findMany(
     params: {
@@ -63,7 +65,7 @@ export class MovieService {
 
     const records = await this.prisma.movie.findMany({
       orderBy,
-      select,
+      select: this.select,
       skip,
       take,
       where,
@@ -76,6 +78,7 @@ export class MovieService {
     const {
       alternativeTitles,
       appearsInList,
+      createdAt,
       deleted,
       deletedAt,
       downloadedAt,
@@ -90,12 +93,14 @@ export class MovieService {
       title,
       tmdbId,
       tmdbRating,
+      updatedAt,
       watched,
     } = record
 
-    return {
+    return new Movie({
       alternativeTitles: alternativeTitles?.split(',') ?? [],
       appearsInList,
+      createdAt,
       deleted,
       deletedAt: deletedAt ? new Date(deletedAt) : null,
       downloadedAt: downloadedAt ? new Date(downloadedAt) : null,
@@ -106,15 +111,14 @@ export class MovieService {
       metacriticRating,
       poster,
       rottenTomatoesRating,
-      tags: tags.map((tag) => tag.tag),
+      tags: tags.map((tag) => new Tag(tag.tag)),
       title,
       tmdbId,
       tmdbRating,
+      updatedAt,
       watched,
-    }
+    })
   }
-
-  // public methods //
 
   private async update(params: {
     data?: Prisma.MovieUpdateInput
@@ -124,7 +128,7 @@ export class MovieService {
 
     const record = await this.prisma.movie.update({
       data,
-      select,
+      select: this.select,
       where,
     })
 
@@ -160,16 +164,14 @@ export class MovieService {
         })
       }
 
-      const record = await trx.movie
-        .upsert({
-          create,
-          select,
-          update,
-          where,
-        })
-        .then(this.serializeRecord)
+      const record = await trx.movie.upsert({
+        create,
+        select: this.select,
+        update,
+        where,
+      })
 
-      return record
+      return this.serializeRecord(record)
     })
   }
 
@@ -186,17 +188,17 @@ export class MovieService {
         : Infinity,
     )
 
-    return {
+    return new Movie({
       ...movie,
       daysUntilDeletion: daysUntilDeletion === Infinity ? 0 : daysUntilDeletion,
       matchedRule: rule,
-    }
+    })
   }
 
   /**
    * Create a new movie record if one does not exist, otherwise update the existing record
    */
-  async createOrUpdate(movie: MoviePayload): Promise<Movie> {
+  async createOrUpdate(movie: MovieDTO): Promise<Movie> {
     try {
       const {
         alternativeTitles,
@@ -333,8 +335,6 @@ export class MovieService {
     }
   }
 
-  // database methods //
-
   /**
    * Returns a list of movies that match the provided rule
    * @param ignoreVariable If true, variable rules (downloadedDaysAgo, watchedDaysAgo) will be ignored
@@ -415,9 +415,8 @@ export class MovieService {
    */
   async getIgnored(): Promise<Movie[]> {
     try {
-      const monitoredIds = await this.getMonitored().then((movies) =>
-        movies.map((movie) => movie.id),
-      )
+      const monitored = await this.getMonitored()
+      const monitoredIds = monitored.map((movie) => movie.id)
 
       const where: Prisma.MovieWhereInput = {
         deleted: false,
@@ -448,26 +447,27 @@ export class MovieService {
       const moviesMap: Record<number, Movie> = {}
 
       for (const rule of enabledRules) {
-        const records: Movie[] = await this.getForRule(rule, true).then(
-          (movies) => movies.map((movie) => this.withComputed(movie, rule)),
-        )
+        const records: Movie[] = await this.getForRule(rule, true)
+        const movies = records.map((movie) => this.withComputed(movie, rule))
 
         // dedupe movies based on `daysUntilDeletion`
-        for (const record of records) {
-          const { daysUntilDeletion, id } = record
+        for (const movie of movies) {
+          const { daysUntilDeletion, id } = movie
 
           if (
             !moviesMap[id] ||
             moviesMap[id].daysUntilDeletion > daysUntilDeletion
           ) {
-            moviesMap[id] = record
+            moviesMap[id] = movie
           }
         }
       }
 
-      return Object.values(moviesMap).sort(
+      const sorted: Movie[] = Object.values(moviesMap).sort(
         (a, b) => a.daysUntilDeletion - b.daysUntilDeletion,
       )
+
+      return sorted
     } catch (e) {
       const error = new Error(`Failed to get monitored movies: ${e.message}`)
       this.logger.error(error.message)

@@ -1,4 +1,4 @@
-import type { GeneralSettings } from '@usharr/types'
+import type { GeneralSettings, GeneralSettingsDTO } from '@usharr/types'
 import React from 'react'
 
 import Button from '../../components/button'
@@ -18,7 +18,7 @@ import { useToast } from '../../hooks/useToast'
 
 export default function General(): JSX.Element {
   const { data, loading } = useFetch<GeneralSettings>('/api/settings/general')
-  const { create } = useCreate<GeneralSettings>('/api/settings/general')
+  const { create } = useCreate<GeneralSettingsDTO>('/api/settings/general')
   const [settings, setSettings] = useApiState<GeneralSettings>(data)
   const { addToast } = useToast()
 

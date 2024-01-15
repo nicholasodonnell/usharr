@@ -1,4 +1,4 @@
-import type { Rule as RuleModel, Tag } from '@usharr/types'
+import type { RuleDTO, Rule as RuleModel, Tag } from '@usharr/types'
 import React from 'react'
 
 import Rules, { NewRule, Rule } from '../../components/rules'
@@ -9,8 +9,8 @@ import { useToast } from '../../hooks/useToast'
 export default function Index(): JSX.Element {
   const { data: rules, fetch, loading } = useFetch<RuleModel[]>('/api/rules')
   const { data: tags, loading: tagsLoading } = useFetch<Tag[]>('/api/tags')
-  const { create } = useCreate<RuleModel>('/api/rules')
-  const { mutate } = useMutate<RuleModel>('/api/rules/:id')
+  const { create } = useCreate<RuleDTO, RuleModel>('/api/rules')
+  const { mutate } = useMutate<RuleDTO, RuleModel>('/api/rules/:id')
   const { destroy } = useDestroy('/api/rules/:id')
   const { addToast } = useToast()
 

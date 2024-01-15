@@ -1,4 +1,8 @@
-import type { TautulliPing, TautulliSettings } from '@usharr/types'
+import type {
+  TautulliPing,
+  TautulliSettings,
+  TautulliSettingsDTO,
+} from '@usharr/types'
 import React from 'react'
 
 import Alert from '../../components/alert'
@@ -21,8 +25,8 @@ export default function Tautulli(): JSX.Element {
     useFetch<TautulliSettings>('/api/settings/tautulli')
   const { data: pingData, loading: pingLoading } =
     useFetch<TautulliPing>('/api/tautulli/ping')
-  const { create } = useCreate<TautulliSettings>('/api/settings/tautulli')
-  const { create: postPing } = useCreate<TautulliSettings, TautulliPing>(
+  const { create } = useCreate<TautulliSettingsDTO>('/api/settings/tautulli')
+  const { create: postPing } = useCreate<TautulliSettingsDTO, TautulliPing>(
     '/api/tautulli/ping',
   )
   const { create: tautulliSync } = useCreate('/api/sync/tautulli')

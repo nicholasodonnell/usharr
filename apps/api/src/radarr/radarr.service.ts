@@ -18,8 +18,6 @@ export class RadarrService {
 
   constructor(private settings: SettingsService) {}
 
-  // priv methods //
-
   private async createClient(
     radarrSettings?: RadarrSettings,
   ): Promise<AxiosInstance> {
@@ -32,8 +30,6 @@ export class RadarrService {
       timeout: 10000,
     })
   }
-
-  // public methods //
 
   /**
    * Delete a movie from Radarr. This action will:

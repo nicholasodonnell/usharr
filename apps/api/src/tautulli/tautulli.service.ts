@@ -19,8 +19,6 @@ export class TautulliService {
 
   constructor(private settings: SettingsService) {}
 
-  // priv methods //
-
   private async createClient(
     tautulliSettings?: TautulliSettings,
   ): Promise<AxiosInstance> {
@@ -33,8 +31,6 @@ export class TautulliService {
       timeout: 10000,
     })
   }
-
-  // public methods //
 
   /**
    * Get all libraries from Tautulli

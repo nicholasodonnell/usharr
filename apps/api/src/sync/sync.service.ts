@@ -31,7 +31,6 @@ const select: Prisma.SyncSelect = {
 @Injectable()
 export class SyncService {
   static readonly FULL: SyncType = 'FULL'
-
   static readonly PARTIAL: SyncType = 'PARTIAL'
   private readonly logger = new Logger(SyncService.name)
 
@@ -44,8 +43,6 @@ export class SyncService {
     private tautulli: TautulliService,
   ) {}
 
-  // priv methods //
-
   private async create(data?: Prisma.SyncCreateInput): Promise<Sync> {
     const record = await this.prisma.sync.create({
       data,
@@ -54,8 +51,6 @@ export class SyncService {
 
     return this.serializeRecord(record)
   }
-
-  // public methods //
 
   private async findFirst(params: {
     orderBy?: Prisma.SyncOrderByWithRelationInput
@@ -130,8 +125,8 @@ export class SyncService {
         const moviesToDelete: Movie[] = await this.movie.getForRule(rule)
 
         for await (const movie of moviesToDelete) {
-          await this.radarr.deleteMovie(movie.id)
-          await this.movie.deleteById(movie.id)
+          // await this.radarr.deleteMovie(movie.id)
+          // await this.movie.deleteById(movie.id)
 
           this.logger.log(
             `Deleted movie "${movie.title}" for rule "${rule.name}"`,
@@ -251,10 +246,15 @@ export class SyncService {
       const importlistMoviesTmdbIds: number[] = importlistMovies.map(
         (movie) => movie.tmdbId,
       )
+      const radarrTags: RadarrTag[] = await await this.radarr.getTags()
 
       for await (const radarrMovie of radarrMovies) {
         // skip movies that have not been downloaded
         if (!radarrMovie.hasFile) continue
+
+        const tags = radarrTags.filter((tag) =>
+          radarrMovie.tags.includes(tag.id),
+        )
 
         const movie: Movie = await this.movie.createOrUpdate({
           alternativeTitles:
@@ -265,9 +265,11 @@ export class SyncService {
           deletedAt: null,
           downloadedAt: radarrMovie.movieFile?.dateAdded,
           id: radarrMovie.id,
+          ignored: false,
           imdbRating: radarrMovie.ratings?.imdb?.value
             ? Math.floor(radarrMovie.ratings.imdb.value * 10)
             : null,
+          lastWatchedAt: null,
           metacriticRating: radarrMovie.ratings?.metacritic?.value
             ? Math.floor(radarrMovie.ratings.metacritic.value)
             : null,
@@ -277,12 +279,13 @@ export class SyncService {
           rottenTomatoesRating: radarrMovie.ratings?.rottenTomatoes?.value
             ? Math.floor(radarrMovie.ratings.rottenTomatoes.value)
             : null,
-          tags: radarrMovie.tags?.map((tag) => ({ id: tag })) ?? [],
+          tags: tags?.map((tag) => ({ id: tag.id, name: tag.label })) ?? [],
           title: radarrMovie.title,
           tmdbId: radarrMovie.tmdbId,
           tmdbRating: radarrMovie.ratings?.tmdb?.value
             ? Math.floor(radarrMovie.ratings.tmdb.value * 10)
             : null,
+          watched: false,
         })
 
         this.logger.log(`Synced movie "${movie.title}"`)
@@ -298,8 +301,6 @@ export class SyncService {
       throw error
     }
   }
-
-  // database methods //
 
   /**
    * Performs a PARTIAL sync:

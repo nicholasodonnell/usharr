@@ -1,36 +1,39 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
-import type {
-  GeneralSettings,
-  RadarrSettings,
-  TautulliSettings,
-} from '@usharr/types'
 
 import { PrismaService } from '../prisma.service'
 
-const generalSettingsSelect: Prisma.SettingsSelect = {
-  enabled: true,
-  syncDays: true,
-  syncHour: true,
-}
-const radarrSettingsSelect: Prisma.SettingsSelect = {
-  radarrApiKey: true,
-  radarrUrl: true,
-}
-const tautulliSettingsSelect: Prisma.SettingsSelect = {
-  tautlliLibraryIds: true,
-  tautulliApiKey: true,
-  tautulliUrl: true,
-}
+import {
+  GeneralSettingsDTO,
+  RadarrSettingsDTO,
+  TautulliSettingsDTO,
+} from './settings.dto'
+import {
+  GeneralSettings,
+  RadarrSettings,
+  TautulliSettings,
+} from './settings.model'
 
 @Injectable()
 export class SettingsService implements OnModuleInit {
   private readonly id = 1
   private readonly logger = new Logger(SettingsService.name)
+  readonly generalSettingsSelect: Prisma.SettingsSelect = {
+    enabled: true,
+    syncDays: true,
+    syncHour: true,
+  }
+  readonly radarrSettingsSelect: Prisma.SettingsSelect = {
+    radarrApiKey: true,
+    radarrUrl: true,
+  }
+  readonly tautulliSettingsSelect: Prisma.SettingsSelect = {
+    tautlliLibraryIds: true,
+    tautulliApiKey: true,
+    tautulliUrl: true,
+  }
 
   constructor(private prisma: PrismaService) {}
-
-  // module methods //
 
   private async findFirst<T>(select: Prisma.SettingsSelect): Promise<T> {
     return this.prisma.settings.findFirst({
@@ -39,19 +42,15 @@ export class SettingsService implements OnModuleInit {
     }) as T
   }
 
-  // priv methods //
-
   private serializeTautulliRecord(record): TautulliSettings {
     const { tautlliLibraryIds, tautulliApiKey, tautulliUrl } = record
 
-    return {
+    return new TautulliSettings({
       tautlliLibraryIds: tautlliLibraryIds?.split(',').map(Number) ?? [],
       tautulliApiKey,
       tautulliUrl,
-    }
+    })
   }
-
-  // public methods //
 
   private async update<T>(params: {
     select: Prisma.SettingsSelect
@@ -71,7 +70,11 @@ export class SettingsService implements OnModuleInit {
    */
   async getGeneral(): Promise<GeneralSettings> {
     try {
-      return this.findFirst<GeneralSettings>(generalSettingsSelect)
+      const record = await this.findFirst<GeneralSettings>(
+        this.generalSettingsSelect,
+      )
+
+      return new GeneralSettings(record)
     } catch (e) {
       const error = new Error(`Failed to get general settings: ${e.message}`)
       this.logger.error(error.message)
@@ -85,7 +88,11 @@ export class SettingsService implements OnModuleInit {
    */
   async getRadarr(): Promise<RadarrSettings> {
     try {
-      return this.findFirst<RadarrSettings>(radarrSettingsSelect)
+      const record = await this.findFirst<RadarrSettings>(
+        this.radarrSettingsSelect,
+      )
+
+      return new RadarrSettings(record)
     } catch (e) {
       const error = new Error(`Failed to get radarr settings: ${e.message}`)
       this.logger.error(error.message)
@@ -100,7 +107,7 @@ export class SettingsService implements OnModuleInit {
   async getTautulli(): Promise<TautulliSettings> {
     try {
       const record = await this.findFirst<TautulliSettings>(
-        tautulliSettingsSelect,
+        this.tautulliSettingsSelect,
       )
 
       return this.serializeTautulliRecord(record)
@@ -123,15 +130,17 @@ export class SettingsService implements OnModuleInit {
   /**
    * Update general settings
    */
-  async updateGeneral(settings: GeneralSettings): Promise<GeneralSettings> {
+  async updateGeneral(settings: GeneralSettingsDTO): Promise<GeneralSettings> {
     try {
       const { enabled, syncDays, syncHour } = settings
       const data = { enabled, syncDays, syncHour }
 
-      return this.update<GeneralSettings>({
-        select: generalSettingsSelect,
+      const record = await this.update<GeneralSettings>({
+        select: this.generalSettingsSelect,
         update: data,
       })
+
+      return new GeneralSettings(record)
     } catch (e) {
       const error = new Error(`Failed to update general settings: ${e.message}`)
       this.logger.error(error.message)
@@ -140,20 +149,20 @@ export class SettingsService implements OnModuleInit {
     }
   }
 
-  // database methods //
-
   /**
    * Update Radarr settings
    */
-  async updateRadarr(settings: RadarrSettings): Promise<RadarrSettings> {
+  async updateRadarr(settings: RadarrSettingsDTO): Promise<RadarrSettings> {
     try {
       const { radarrApiKey, radarrUrl } = settings
       const data = { radarrApiKey, radarrUrl }
 
-      return this.update<RadarrSettings>({
-        select: radarrSettingsSelect,
+      const record = await this.update<RadarrSettings>({
+        select: this.radarrSettingsSelect,
         update: data,
       })
+
+      return new RadarrSettings(record)
     } catch (e) {
       const error = new Error(`Failed to update radarr settings: ${e.message}`)
       this.logger.error(error.message)
@@ -165,7 +174,9 @@ export class SettingsService implements OnModuleInit {
   /**
    * Update Tautulli settings
    */
-  async updateTautulli(settings: TautulliSettings): Promise<TautulliSettings> {
+  async updateTautulli(
+    settings: TautulliSettingsDTO,
+  ): Promise<TautulliSettings> {
     try {
       const { tautlliLibraryIds, tautulliApiKey, tautulliUrl } = settings
       const data = {
@@ -174,10 +185,12 @@ export class SettingsService implements OnModuleInit {
         tautulliUrl,
       }
 
-      return this.update<TautulliSettings>({
-        select: tautulliSettingsSelect,
+      const record = this.update<TautulliSettings>({
+        select: this.tautulliSettingsSelect,
         update: data,
       })
+
+      return this.serializeTautulliRecord(record)
     } catch (e) {
       const error = new Error(
         `Failed to update tautulli settings: ${e.message}`,

@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common'
-import type { Tag } from '@usharr/types'
 
+import { Tag } from './tag.model'
 import { TagService } from './tag.service'
 
 @Controller('api/tags')

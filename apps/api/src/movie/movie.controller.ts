@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Put } from '@nestjs/common'
-import { Movie } from '@usharr/types'
 
+import { MovieDTO } from './movie.dto'
+import { Movie } from './movie.model'
 import { MovieService } from './movie.service'
 
 @Controller('api/movies')
@@ -28,7 +29,10 @@ export class MovieController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() movie: Movie): Promise<Movie> {
+  async update(
+    @Param('id') id: string,
+    @Body() movie: MovieDTO,
+  ): Promise<Movie> {
     return await this.movie.createOrUpdate({ ...movie, id: +id })
   }
 }

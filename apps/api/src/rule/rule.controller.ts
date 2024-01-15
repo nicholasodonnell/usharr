@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
-import type { Rule } from '@usharr/types'
 
+import { RuleDTO } from './rule.dto'
+import { Rule } from './rule.model'
 import { RuleService } from './rule.service'
 
 @Controller('api/rules')
@@ -8,8 +9,8 @@ export class RuleController {
   constructor(private readonly ruleService: RuleService) {}
 
   @Post()
-  async create(@Body() rule: Rule): Promise<Rule> {
-    return await this.ruleService.createOrUpdate(rule)
+  async create(@Body() rule: RuleDTO): Promise<Rule> {
+    return await this.ruleService.create(rule)
   }
 
   @Delete(':id')
@@ -23,7 +24,7 @@ export class RuleController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() rule: Rule): Promise<Rule> {
-    return await this.ruleService.createOrUpdate({ ...rule, id: +id })
+  async update(@Param('id') id: string, @Body() rule: RuleDTO): Promise<Rule> {
+    return await this.ruleService.updateById(+id, rule)
   }
 }

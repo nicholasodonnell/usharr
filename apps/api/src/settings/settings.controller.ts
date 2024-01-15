@@ -1,10 +1,15 @@
 import { Body, Controller, Get, Post } from '@nestjs/common'
-import type {
+
+import {
+  GeneralSettingsDTO,
+  RadarrSettingsDTO,
+  TautulliSettingsDTO,
+} from './settings.dto'
+import {
   GeneralSettings,
   RadarrSettings,
   TautulliSettings,
-} from '@usharr/types'
-
+} from './settings.model'
 import { SettingsService } from './settings.service'
 
 @Controller('api/settings')
@@ -27,18 +32,20 @@ export class SettingsController {
   }
 
   @Post('general')
-  async updateGeneral(@Body() body: GeneralSettings): Promise<GeneralSettings> {
+  async updateGeneral(
+    @Body() body: GeneralSettingsDTO,
+  ): Promise<GeneralSettings> {
     return await this.settings.updateGeneral(body)
   }
 
   @Post('radarr')
-  async updateRadarr(@Body() body: RadarrSettings): Promise<RadarrSettings> {
+  async updateRadarr(@Body() body: RadarrSettingsDTO): Promise<RadarrSettings> {
     return await this.settings.updateRadarr(body)
   }
 
   @Post('tautulli')
   async updateTautulli(
-    @Body() body: TautulliSettings,
+    @Body() body: TautulliSettingsDTO,
   ): Promise<TautulliSettings> {
     return await this.settings.updateTautulli(body)
   }
