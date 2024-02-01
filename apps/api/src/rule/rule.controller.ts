@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
+import { ApiOkResponse } from '@nestjs/swagger'
 
 import { RuleDTO } from './rule.dto'
 import { Rule } from './rule.model'
@@ -8,6 +9,7 @@ import { RuleService } from './rule.service'
 export class RuleController {
   constructor(private readonly ruleService: RuleService) {}
 
+  @ApiOkResponse({ type: Rule })
   @Post()
   async create(@Body() rule: RuleDTO): Promise<Rule> {
     return await this.ruleService.create(rule)
@@ -18,11 +20,13 @@ export class RuleController {
     return await this.ruleService.deleteById(+id)
   }
 
+  @ApiOkResponse({ type: [Rule] })
   @Get()
   async get(): Promise<Rule[]> {
     return await this.ruleService.getAll()
   }
 
+  @ApiOkResponse({ type: Rule })
   @Put(':id')
   async update(@Param('id') id: string, @Body() rule: RuleDTO): Promise<Rule> {
     return await this.ruleService.updateById(+id, rule)

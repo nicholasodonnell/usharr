@@ -200,6 +200,7 @@ export type RadarrMediaManagement = {
   skipFreeSpaceCheckWhenImporting: boolean
   useScriptImport: boolean
 }
+
 export type RadarrPing = {
   success: boolean
   hasRecycleBin?: boolean

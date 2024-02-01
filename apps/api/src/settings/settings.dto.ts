@@ -8,7 +8,7 @@ import {
   GeneralSettings,
   RadarrSettings,
   TautulliSettings,
-} from './Settings.model'
+} from './settings.model'
 
 export class GeneralSettingsDTO
   extends GeneralSettings

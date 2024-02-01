@@ -4,7 +4,6 @@ import type {
   TautulliGetLibraryNamesResponse,
   TautulliLibrary,
   TautulliMediaInfo,
-  TautulliPing,
   TautulliSettings,
   TautulliWatchHistory,
 } from '@usharr/types'
@@ -12,6 +11,8 @@ import type { AxiosInstance } from 'axios'
 import axios from 'axios'
 
 import { SettingsService } from '../settings/settings.service'
+
+import { TautulliPing } from './tautulli.model'
 
 @Injectable()
 export class TautulliService {
@@ -121,10 +122,10 @@ export class TautulliService {
         },
       })
 
-      return {
+      return new TautulliPing({
         libraries: await this.getLibraries(tautulliSettings),
         success: response.status === 200,
-      }
+      })
     } catch (e) {
       const error = new Error(`Failed to ping tautulli: ${e.message}`)
       this.logger.error(error.message)

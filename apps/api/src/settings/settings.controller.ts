@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common'
+import { ApiOkResponse } from '@nestjs/swagger'
 
 import {
   GeneralSettingsDTO,
@@ -16,21 +17,25 @@ import { SettingsService } from './settings.service'
 export class SettingsController {
   constructor(private readonly settings: SettingsService) {}
 
+  @ApiOkResponse({ type: GeneralSettings })
   @Get('general')
   async getGeneral(): Promise<GeneralSettings> {
     return await this.settings.getGeneral()
   }
 
+  @ApiOkResponse({ type: RadarrSettings })
   @Get('radarr')
   async getRadarr(): Promise<RadarrSettings> {
     return await this.settings.getRadarr()
   }
 
+  @ApiOkResponse({ type: TautulliSettings })
   @Get('tautulli')
   async getTautulli(): Promise<TautulliSettings> {
     return await this.settings.getTautulli()
   }
 
+  @ApiOkResponse({ type: GeneralSettings })
   @Post('general')
   async updateGeneral(
     @Body() body: GeneralSettingsDTO,
@@ -38,11 +43,13 @@ export class SettingsController {
     return await this.settings.updateGeneral(body)
   }
 
+  @ApiOkResponse({ type: RadarrSettings })
   @Post('radarr')
   async updateRadarr(@Body() body: RadarrSettingsDTO): Promise<RadarrSettings> {
     return await this.settings.updateRadarr(body)
   }
 
+  @ApiOkResponse({ type: TautulliSettings })
   @Post('tautulli')
   async updateTautulli(
     @Body() body: TautulliSettingsDTO,

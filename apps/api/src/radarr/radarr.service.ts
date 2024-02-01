@@ -3,7 +3,6 @@ import type {
   ImportlistMovie,
   RadarrMediaManagement,
   RadarrMovie,
-  RadarrPing,
   RadarrSettings,
   RadarrTag,
 } from '@usharr/types'
@@ -11,6 +10,8 @@ import type { AxiosInstance } from 'axios'
 import axios from 'axios'
 
 import { SettingsService } from '../settings/settings.service'
+
+import { RadarrPing } from './radarr.model'
 
 @Injectable()
 export class RadarrService {
@@ -146,12 +147,12 @@ export class RadarrService {
       const client = await this.createClient(radarrSettings)
       const response = await client.get('/api/v3/system/status')
 
-      return {
+      return new RadarrPing({
         hasRecycleBin: Boolean(
           (await this.getMediaManagementConfig(radarrSettings)).recycleBin,
         ),
         success: response.status === 200,
-      }
+      })
     } catch (e) {
       const error = new Error(`Failed to ping radarr: ${e.message}`)
       this.logger.error(error.message)

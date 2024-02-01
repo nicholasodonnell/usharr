@@ -115,9 +115,9 @@ export class RuleService {
   }
 
   private async upsert(params: {
-    create?: Prisma.RuleCreateInput
-    update?: Prisma.RuleUpdateInput
-    where?: Prisma.RuleWhereUniqueInput
+    create: Prisma.RuleCreateInput
+    update: Prisma.RuleUpdateInput
+    where: Prisma.RuleWhereUniqueInput
   }): Promise<Rule> {
     const { create, update, where } = params
 
@@ -130,6 +130,7 @@ export class RuleService {
           },
         })
       }
+
       const record = await trx.rule.upsert({
         create,
         select: this.select,
@@ -183,7 +184,8 @@ export class RuleService {
 
       return await this.upsert({
         create: data,
-        where: {},
+        update: data,
+        where: { id: -1 },
       })
     } catch (e) {
       const error = new Error(`Failed to create or update rule: ${e.message}`)
@@ -306,6 +308,7 @@ export class RuleService {
       }
 
       return await this.upsert({
+        create: data,
         update: data,
         where: { id },
       })

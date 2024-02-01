@@ -125,8 +125,8 @@ export class SyncService {
         const moviesToDelete: Movie[] = await this.movie.getForRule(rule)
 
         for await (const movie of moviesToDelete) {
-          // await this.radarr.deleteMovie(movie.id)
-          // await this.movie.deleteById(movie.id)
+          await this.radarr.deleteMovie(movie.id)
+          await this.movie.deleteById(movie.id)
 
           this.logger.log(
             `Deleted movie "${movie.title}" for rule "${rule.name}"`,

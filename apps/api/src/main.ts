@@ -2,6 +2,7 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { NestFactory } from '@nestjs/core'
 import { NestExpressApplication } from '@nestjs/platform-express'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import * as morgan from 'morgan'
 
 import { AppModule } from './app.module'
@@ -25,6 +26,11 @@ async function bootstrap() {
   // interceptors
   app.useGlobalInterceptors(new ErrorInterceptor())
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)))
+
+  // swagger
+  const config = new DocumentBuilder().setTitle('Usharr API').build()
+  const document = SwaggerModule.createDocument(app, config)
+  SwaggerModule.setup('api', app, document)
 
   await app.listen(port, '0.0.0.0')
 }

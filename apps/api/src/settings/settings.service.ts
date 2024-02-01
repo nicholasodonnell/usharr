@@ -185,7 +185,7 @@ export class SettingsService implements OnModuleInit {
         tautulliUrl,
       }
 
-      const record = this.update<TautulliSettings>({
+      const record = await this.update<TautulliSettings>({
         select: this.tautulliSettingsSelect,
         update: data,
       })

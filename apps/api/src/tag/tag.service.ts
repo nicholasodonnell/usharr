@@ -57,9 +57,9 @@ export class TagService {
   }
 
   private async upsert(params: {
-    create?: Prisma.TagCreateInput
-    update?: Prisma.TagUpdateInput
-    where?: Prisma.TagWhereUniqueInput
+    create: Prisma.TagCreateInput
+    update: Prisma.TagUpdateInput
+    where: Prisma.TagWhereUniqueInput
   }): Promise<Tag> {
     const { create, update, where } = params
 
