@@ -71,7 +71,8 @@ services:
 1. `npm i`
 2. `npm run db:generate`
 3. `docker-compose up`
-4. Navigate to [localhost:5588](http://localhost:3000)
+4. Navigate to [localhost:5588](http://localhost:3000) to view the web UI
+5. Navigate to [localhost:5588/api](http://localhost:3000/api) to view the Swagger docs
 
 ### Generate migration
 
