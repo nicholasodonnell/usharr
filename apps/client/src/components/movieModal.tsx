@@ -11,18 +11,18 @@ import { P } from './text'
 
 export type MovieModalProps = {
   action?: string
-  onClose: () => void
+  movie?: Movie
   onAction?: (movie: Movie) => Promise<void>
+  onClose: () => void
   open: boolean
   title: string
-  movie?: Movie
 }
 
 export default function MovieModal({
   action,
   movie,
-  onClose,
   onAction,
+  onClose,
   open,
   title,
 }: MovieModalProps): JSX.Element {
@@ -38,8 +38,8 @@ export default function MovieModal({
           <a
             className="ml-auto"
             href={`https://www.themoviedb.org/movie/${movie.tmdbId}`}
-            target="_blank"
-            rel="noreferrer">
+            rel="noreferrer"
+            target="_blank">
             <External className="h-6 w-6" />
           </a>
         </Title>
@@ -52,9 +52,9 @@ export default function MovieModal({
           <div className="flex w-full flex-1 flex-row">
             <div className="mr-8 w-1/4">
               <img
+                alt={movie.title}
                 className="aspect-[2/3] rounded-md border border-app-background-accent shadow"
                 src={movie.poster}
-                alt={movie.title}
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -123,7 +123,7 @@ export default function MovieModal({
               {movie.daysUntilDeletion && movie.daysUntilDeletion !== null && (
                 <div className="grid grid-cols-2 gap-4">
                   <P bold>Time Remaining</P>
-                  <P className="break-words text-red" bold>
+                  <P bold className="break-words text-red">
                     {movie.daysUntilDeletion} days
                   </P>
                 </div>

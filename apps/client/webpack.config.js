@@ -24,8 +24,8 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.[jt]sx?$/,
         exclude: /node_modules/,
+        test: /\.[jt]sx?$/,
         use: [
           {
             loader: 'esbuild-loader',
@@ -44,11 +44,11 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
+              // postcss-loader
+              importLoaders: 1,
               modules: {
                 localIdentName: '[local]',
               },
-              // postcss-loader
-              importLoaders: 1,
             },
           },
           {
@@ -57,30 +57,27 @@ module.exports = {
         ],
       },
       {
-        test: /\.(png|jpe?g|gif|svg|webmanifest)$/i,
         loader: 'file-loader',
         options: {
           name: '[name].[ext]',
         },
+        test: /\.(png|jpe?g|gif|svg|webmanifest)$/i,
       },
     ],
   },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+  optimization: {
+    chunkIds: 'named',
+    emitOnErrors: false,
+    minimize: isProd,
+    splitChunks: {
+      chunks: 'async',
+    },
   },
   output: {
     clean: true,
     filename: 'app.js',
     path: path.join(__dirname, 'dist'),
     publicPath: '/',
-  },
-  optimization: {
-    minimize: isProd,
-    chunkIds: 'named',
-    emitOnErrors: false,
-    splitChunks: {
-      chunks: 'async',
-    },
   },
   plugins: [
     new DefinePlugin({
@@ -90,4 +87,7 @@ module.exports = {
       template: './public/index.html',
     }),
   ],
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+  },
 }

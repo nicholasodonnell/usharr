@@ -15,25 +15,24 @@ import type {
 } from '@usharr/types'
 
 import { MovieService } from '../movie/movie.service'
-import { PrismaService } from '../prisma/prisma.service'
+import { PrismaService } from '../prisma.service'
 import { RadarrService } from '../radarr/radarr.service'
 import { RuleService } from '../rule/rule.service'
 import { TagService } from '../tag/tag.service'
 import { TautulliService } from '../tautulli/tautulli.service'
 
 const select: Prisma.SyncSelect = {
-  id: true,
-  type: true,
-  startedAt: true,
   finishedAt: true,
+  id: true,
+  startedAt: true,
+  type: true,
 }
 
 @Injectable()
 export class SyncService {
-  private readonly logger = new Logger(SyncService.name)
-
   static readonly FULL: SyncType = 'FULL'
   static readonly PARTIAL: SyncType = 'PARTIAL'
+  private readonly logger = new Logger(SyncService.name)
 
   constructor(
     private movie: MovieService,
@@ -44,32 +43,167 @@ export class SyncService {
     private tautulli: TautulliService,
   ) {}
 
-  // priv methods //
+  private async create(data?: Prisma.SyncCreateInput): Promise<Sync> {
+    const record = await this.prisma.sync.create({
+      data,
+      select,
+    })
+
+    return this.serializeRecord(record)
+  }
+
+  private async findFirst(params: {
+    orderBy?: Prisma.SyncOrderByWithRelationInput
+    where: Prisma.SyncWhereInput
+  }): Promise<Sync | null> {
+    const { orderBy, where } = params
+
+    const record = await this.prisma.sync.findFirst({
+      orderBy,
+      select,
+      where,
+    })
+
+    return record ? this.serializeRecord(record) : null
+  }
+
+  private async findMany(
+    params: {
+      orderBy?: Prisma.SyncOrderByWithRelationInput
+      skip?: number
+      take?: number
+      where?: Prisma.SyncWhereInput
+    } = {},
+  ): Promise<Sync[]> {
+    const { orderBy, skip, take, where } = params
+
+    const records = await this.prisma.sync.findMany({
+      orderBy,
+      select,
+      skip,
+      take,
+      where,
+    })
+
+    return records.map(this.serializeRecord)
+  }
 
   private serializeRecord(record): Sync {
-    const { id, type, startedAt, finishedAt } = record
+    const { finishedAt, id, startedAt, type } = record
 
     return {
-      id,
-      type,
-      startedAt: new Date(startedAt),
       finishedAt: finishedAt ? new Date(startedAt) : null,
+      id,
+      startedAt: new Date(startedAt),
+      type,
     }
   }
 
-  // public methods //
+  private async update(params: {
+    data?: Prisma.SyncUpdateInput
+    where: Prisma.SyncWhereUniqueInput
+  }): Promise<Sync> {
+    const { data, where } = params
+
+    const record = await this.prisma.sync.update({
+      data,
+      select,
+      where,
+    })
+
+    return this.serializeRecord(record)
+  }
 
   /**
-   * Creates a new sync record in the database with the given type and started at the current time
+   * Deletes movies that match a rule
    */
-  async start(type: SyncType): Promise<Sync> {
+  async deleteMovies(): Promise<void> {
     try {
-      return await this.create({
-        startedAt: new Date(),
-        type,
+      const enabledRules: Rule[] = await this.rule.getEnabled()
+
+      for await (const rule of enabledRules) {
+        const moviesToDelete: Movie[] = await this.movie.getForRule(rule)
+
+        for await (const movie of moviesToDelete) {
+          await this.radarr.deleteMovie(movie.id)
+          await this.movie.deleteById(movie.id)
+
+          this.logger.log(
+            `Deleted movie "${movie.title}" for rule "${rule.name}"`,
+          )
+        }
+      }
+    } catch (e) {
+      const error = new Error(`Failed to delete movies: ${e.message}`)
+      this.logger.error(error.message)
+
+      throw error
+    }
+  }
+
+  /**
+   * Marks the sync with the given id as finished with the current time
+   */
+  async finish(id: number): Promise<Sync> {
+    try {
+      return await this.update({
+        data: { finishedAt: new Date() },
+        where: { id },
       })
     } catch (e) {
-      const error = new Error(`Failed to start sync: ${e.message}`)
+      const error = new Error(`Failed to finish sync: ${e.message}`)
+      this.logger.error(error)
+
+      throw error
+    }
+  }
+
+  /**
+   * Performs a FULL sync:
+   * - update all movies
+   * - update all tags
+   * - update watch history
+   * - delete movies for rules
+   */
+  async full(): Promise<void> {
+    let sync: Sync = null
+
+    try {
+      this.logger.log('Starting full sync')
+      sync = await this.start(SyncService.FULL)
+
+      await this.tags()
+      await this.movies()
+      await this.watchHistory()
+      await this.deleteMovies()
+
+      this.logger.log('Finished full sync')
+    } catch (e) {
+      const error = new Error(`Failed to perform full sync: ${e.message}`)
+      this.logger.error(error.message)
+
+      throw error
+    } finally {
+      await this.finish(sync.id).catch(() => {
+        /* noop */
+      })
+    }
+  }
+
+  /**
+   * Returns the last finished FULL sync
+   */
+  async getLastFull(): Promise<Sync | null> {
+    try {
+      return this.findFirst({
+        orderBy: { finishedAt: 'desc' },
+        where: {
+          finishedAt: { not: null },
+          type: SyncService.FULL,
+        },
+      })
+    } catch (e) {
+      const error = new Error(`Failed to get last full sync: ${e.message}`)
       this.logger.error(error)
 
       throw error
@@ -86,43 +220,6 @@ export class SyncService {
       })
     } catch (e) {
       const error = new Error(`Failed to get running syncs: ${e.message}`)
-      this.logger.error(error)
-
-      throw error
-    }
-  }
-
-  /**
-   * Returns the last finished FULL sync
-   */
-  async getLastFull(): Promise<Sync | null> {
-    try {
-      return this.findFirst({
-        where: {
-          type: SyncService.FULL,
-          finishedAt: { not: null },
-        },
-        orderBy: { finishedAt: 'desc' },
-      })
-    } catch (e) {
-      const error = new Error(`Failed to get last full sync: ${e.message}`)
-      this.logger.error(error)
-
-      throw error
-    }
-  }
-
-  /**
-   * Marks the sync with the given id as finished with the current time
-   */
-  async finish(id: number): Promise<Sync> {
-    try {
-      return await this.update({
-        where: { id },
-        data: { finishedAt: new Date() },
-      })
-    } catch (e) {
-      const error = new Error(`Failed to finish sync: ${e.message}`)
       this.logger.error(error)
 
       throw error
@@ -149,38 +246,46 @@ export class SyncService {
       const importlistMoviesTmdbIds: number[] = importlistMovies.map(
         (movie) => movie.tmdbId,
       )
+      const radarrTags: RadarrTag[] = await await this.radarr.getTags()
 
       for await (const radarrMovie of radarrMovies) {
         // skip movies that have not been downloaded
         if (!radarrMovie.hasFile) continue
 
+        const tags = radarrTags.filter((tag) =>
+          radarrMovie.tags.includes(tag.id),
+        )
+
         const movie: Movie = await this.movie.createOrUpdate({
-          id: radarrMovie.id,
           alternativeTitles:
             radarrMovie.alternateTitles?.map((title) => title.title) ??
             undefined,
-          tmdbId: radarrMovie.tmdbId,
+          appearsInList: importlistMoviesTmdbIds.includes(radarrMovie.tmdbId),
           deleted: false,
+          deletedAt: null,
           downloadedAt: radarrMovie.movieFile?.dateAdded,
+          id: radarrMovie.id,
+          ignored: false,
           imdbRating: radarrMovie.ratings?.imdb?.value
             ? Math.floor(radarrMovie.ratings.imdb.value * 10)
             : null,
-          tmdbRating: radarrMovie.ratings?.tmdb?.value
-            ? Math.floor(radarrMovie.ratings.tmdb.value * 10)
-            : null,
+          lastWatchedAt: null,
           metacriticRating: radarrMovie.ratings?.metacritic?.value
             ? Math.floor(radarrMovie.ratings.metacritic.value)
             : null,
-          rottenTomatoesRating: radarrMovie.ratings?.rottenTomatoes?.value
-            ? Math.floor(radarrMovie.ratings.rottenTomatoes.value)
-            : null,
-          appearsInList: importlistMoviesTmdbIds.includes(radarrMovie.tmdbId),
           poster: radarrMovie.images
             ?.find((image) => image.coverType === 'poster')
             ?.remoteUrl?.replace(/original/, 'w500'),
-          tags: radarrMovie.tags?.map((tag) => ({ id: tag })) ?? [],
+          rottenTomatoesRating: radarrMovie.ratings?.rottenTomatoes?.value
+            ? Math.floor(radarrMovie.ratings.rottenTomatoes.value)
+            : null,
+          tags: tags?.map((tag) => ({ id: tag.id, name: tag.label })) ?? [],
           title: radarrMovie.title,
-          deletedAt: null,
+          tmdbId: radarrMovie.tmdbId,
+          tmdbRating: radarrMovie.ratings?.tmdb?.value
+            ? Math.floor(radarrMovie.ratings.tmdb.value * 10)
+            : null,
+          watched: false,
         })
 
         this.logger.log(`Synced movie "${movie.title}"`)
@@ -192,6 +297,53 @@ export class SyncService {
     } catch (e) {
       const error = new Error(`Failed to sync movies: ${e.message}`)
       this.logger.error(error.message)
+
+      throw error
+    }
+  }
+
+  /**
+   * Performs a PARTIAL sync:
+   * - update all movies
+   * - update all tags
+   * - update watch history
+   */
+  async partial(): Promise<void> {
+    let sync: Sync = null
+
+    try {
+      this.logger.log('Starting partial sync')
+      sync = await this.start(SyncService.PARTIAL)
+
+      await this.tags()
+      await this.movies()
+      await this.watchHistory()
+
+      this.logger.log('Finished partial sync')
+    } catch (e) {
+      const error = new Error(`Failed to perform partial sync: ${e.message}`)
+      this.logger.error(error.message)
+
+      throw error
+    } finally {
+      await this.finish(sync.id).catch(() => {
+        /* noop */
+      })
+    }
+  }
+
+  /**
+   * Creates a new sync record in the database with the given type and started at the current time
+   */
+  async start(type: SyncType): Promise<Sync> {
+    try {
+      return await this.create({
+        startedAt: new Date(),
+        type,
+      })
+    } catch (e) {
+      const error = new Error(`Failed to start sync: ${e.message}`)
+      this.logger.error(error)
 
       throw error
     }
@@ -275,8 +427,8 @@ export class SyncService {
 
         const movie: Movie = await this.movie.createOrUpdate({
           ...movieToSync,
-          watched,
           lastWatchedAt,
+          watched,
         })
 
         this.logger.log(`Synced watch history for "${movie.title}"`)
@@ -287,156 +439,5 @@ export class SyncService {
 
       throw error
     }
-  }
-
-  /**
-   * Deletes movies that match a rule
-   */
-  async deleteMovies(): Promise<void> {
-    try {
-      const enabledRules: Rule[] = await this.rule.getEnabled()
-
-      for await (const rule of enabledRules) {
-        const moviesToDelete: Movie[] = await this.movie.getForRule(rule)
-
-        for await (const movie of moviesToDelete) {
-          await this.radarr.deleteMovie(movie.id)
-          await this.movie.deleteById(movie.id)
-
-          this.logger.log(
-            `Deleted movie "${movie.title}" for rule "${rule.name}"`,
-          )
-        }
-      }
-    } catch (e) {
-      const error = new Error(`Failed to delete movies: ${e.message}`)
-      this.logger.error(error.message)
-
-      throw error
-    }
-  }
-
-  /**
-   * Performs a FULL sync:
-   * - update all movies
-   * - update all tags
-   * - update watch history
-   * - delete movies for rules
-   */
-  async full(): Promise<void> {
-    let sync: Sync = null
-
-    try {
-      this.logger.log('Starting full sync')
-      sync = await this.start(SyncService.FULL)
-
-      await this.tags()
-      await this.movies()
-      await this.watchHistory()
-      await this.deleteMovies()
-
-      this.logger.log('Finished full sync')
-    } catch (e) {
-      const error = new Error(`Failed to perform full sync: ${e.message}`)
-      this.logger.error(error.message)
-
-      throw error
-    } finally {
-      await this.finish(sync.id).catch(() => {
-        /* noop */
-      })
-    }
-  }
-
-  /**
-   * Performs a PARTIAL sync:
-   * - update all movies
-   * - update all tags
-   * - update watch history
-   */
-  async partial(): Promise<void> {
-    let sync: Sync = null
-
-    try {
-      this.logger.log('Starting partial sync')
-      sync = await this.start(SyncService.PARTIAL)
-
-      await this.tags()
-      await this.movies()
-      await this.watchHistory()
-
-      this.logger.log('Finished partial sync')
-    } catch (e) {
-      const error = new Error(`Failed to perform partial sync: ${e.message}`)
-      this.logger.error(error.message)
-
-      throw error
-    } finally {
-      await this.finish(sync.id).catch(() => {
-        /* noop */
-      })
-    }
-  }
-
-  // database methods //
-
-  private async create(data?: Prisma.SyncCreateInput): Promise<Sync> {
-    const record = await this.prisma.sync.create({
-      select,
-      data,
-    })
-
-    return this.serializeRecord(record)
-  }
-
-  private async update(params: {
-    where: Prisma.SyncWhereUniqueInput
-    data?: Prisma.SyncUpdateInput
-  }): Promise<Sync> {
-    const { where, data } = params
-
-    const record = await this.prisma.sync.update({
-      select,
-      where,
-      data,
-    })
-
-    return this.serializeRecord(record)
-  }
-
-  private async findMany(
-    params: {
-      orderBy?: Prisma.SyncOrderByWithRelationInput
-      skip?: number
-      take?: number
-      where?: Prisma.SyncWhereInput
-    } = {},
-  ): Promise<Sync[]> {
-    const { orderBy, skip, take, where } = params
-
-    const records = await this.prisma.sync.findMany({
-      orderBy,
-      select,
-      skip,
-      take,
-      where,
-    })
-
-    return records.map(this.serializeRecord)
-  }
-
-  private async findFirst(params: {
-    where: Prisma.SyncWhereInput
-    orderBy?: Prisma.SyncOrderByWithRelationInput
-  }): Promise<Sync | null> {
-    const { where, orderBy } = params
-
-    const record = await this.prisma.sync.findFirst({
-      select,
-      where,
-      orderBy,
-    })
-
-    return record ? this.serializeRecord(record) : null
   }
 }

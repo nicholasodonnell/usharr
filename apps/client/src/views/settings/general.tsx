@@ -1,4 +1,4 @@
-import type { GeneralSettings } from '@usharr/types'
+import type { GeneralSettings, GeneralSettingsDTO } from '@usharr/types'
 import React from 'react'
 
 import Button from '../../components/button'
@@ -18,7 +18,7 @@ import { useToast } from '../../hooks/useToast'
 
 export default function General(): JSX.Element {
   const { data, loading } = useFetch<GeneralSettings>('/api/settings/general')
-  const { create } = useCreate<GeneralSettings>('/api/settings/general')
+  const { create } = useCreate<GeneralSettingsDTO>('/api/settings/general')
   const [settings, setSettings] = useApiState<GeneralSettings>(data)
   const { addToast } = useToast()
 
@@ -52,8 +52,8 @@ export default function General(): JSX.Element {
           <NumberInput
             className="col-span-3"
             disabled={loading}
-            min={1}
             max={365}
+            min={1}
             onChange={setProperty('syncDays')}
             required
             value={settings?.syncDays}
@@ -64,6 +64,7 @@ export default function General(): JSX.Element {
           <Select<number>
             className="col-span-3"
             disabled={loading}
+            onChange={setProperty('syncHour')}
             options={[
               { label: '0:00', value: 0 },
               { label: '1:00', value: 1 },
@@ -90,7 +91,6 @@ export default function General(): JSX.Element {
               { label: '22:00', value: 22 },
               { label: '23:00', value: 23 },
             ]}
-            onChange={setProperty('syncHour')}
             required
             value={settings?.syncHour}
           />

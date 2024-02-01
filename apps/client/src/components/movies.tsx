@@ -28,10 +28,10 @@ export function Movie({ action, movie, onAction }: MovieProps): JSX.Element {
         className="relative block w-full cursor-pointer overflow-hidden rounded-md border border-app-background-accent bg-app-background shadow transition-all hover:scale-105 hover:shadow-lg"
         onClick={() => setModalOpen(true)}>
         <img
-          className="relative z-10 aspect-[2/3] h-full w-full"
-          src={movie.poster}
           alt={movie.title}
+          className="relative z-10 aspect-[2/3] h-full w-full"
           loading="lazy"
+          src={movie.poster}
         />
         <span className="pointer-events-none absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transform text-center text-transparent">
           {movie.title}
@@ -66,8 +66,8 @@ export function MoviesSkeleton(): JSX.Element {
     <>
       {Array.from({ length: 100 }).map((_, index) => (
         <div
-          key={index}
           className="flex aspect-[2/3] h-full w-full animate-pulse flex-col items-center justify-center rounded-md border border-app-background-accent bg-app-background shadow"
+          key={index}
         />
       ))}
     </>

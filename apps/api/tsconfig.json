@@ -12,6 +12,7 @@
     "noImplicitAny": false,
     "outDir": "./dist",
     "removeComments": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strictBindCallApply": false,

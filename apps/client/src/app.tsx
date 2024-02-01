@@ -20,21 +20,21 @@ export default function App(): JSX.Element {
     <>
       <Routes>
         <Route element={<Page />}>
-          <Route index element={<Redirect to="/movies" />} />
+          <Route element={<Redirect to="/movies" />} index />
           <Route path="movies">
-            <Route index element={<Redirect to="/movies/monitored" />} />
-            <Route path="monitored" element={<Monitored />} />
-            <Route path="ignored" element={<Ignored />} />
-            <Route path="deleted" element={<Deleted />} />
+            <Route element={<Redirect to="/movies/monitored" />} index />
+            <Route element={<Monitored />} path="monitored" />
+            <Route element={<Ignored />} path="ignored" />
+            <Route element={<Deleted />} path="deleted" />
           </Route>
-          <Route path="rules" element={<Rules />} />
+          <Route element={<Rules />} path="rules" />
           <Route path="settings">
-            <Route index element={<Redirect to="/settings/general" />} />
-            <Route path="general" element={<General />} />
-            <Route path="radarr" element={<Radarr />} />
-            <Route path="tautulli" element={<Tautulli />} />
+            <Route element={<Redirect to="/settings/general" />} index />
+            <Route element={<General />} path="general" />
+            <Route element={<Radarr />} path="radarr" />
+            <Route element={<Tautulli />} path="tautulli" />
           </Route>
-          <Route path="*" element={<Redirect to="/" />} />
+          <Route element={<Redirect to="/" />} path="*" />
         </Route>
       </Routes>
       <Toasts toasts={toasts} />

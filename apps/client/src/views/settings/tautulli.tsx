@@ -1,4 +1,8 @@
-import type { TautulliSettings, TautulliPing } from '@usharr/types'
+import type {
+  TautulliPing,
+  TautulliSettings,
+  TautulliSettingsDTO,
+} from '@usharr/types'
 import React from 'react'
 
 import Alert from '../../components/alert'
@@ -21,8 +25,8 @@ export default function Tautulli(): JSX.Element {
     useFetch<TautulliSettings>('/api/settings/tautulli')
   const { data: pingData, loading: pingLoading } =
     useFetch<TautulliPing>('/api/tautulli/ping')
-  const { create } = useCreate<TautulliSettings>('/api/settings/tautulli')
-  const { create: postPing } = useCreate<TautulliSettings, TautulliPing>(
+  const { create } = useCreate<TautulliSettingsDTO>('/api/settings/tautulli')
+  const { create: postPing } = useCreate<TautulliSettingsDTO, TautulliPing>(
     '/api/tautulli/ping',
   )
   const { create: tautulliSync } = useCreate('/api/sync/tautulli')
@@ -96,7 +100,7 @@ export default function Tautulli(): JSX.Element {
           <Label className="col-span-1" required>
             Libraries
           </Label>
-          <MultipleSelect<number | null>
+          <MultipleSelect<null | number>
             className="col-span-3"
             disabled={
               settingsLoading ||
@@ -104,11 +108,11 @@ export default function Tautulli(): JSX.Element {
               !ping?.libraries ||
               ping?.libraries?.length === 0
             }
+            onChange={setProperty('tautlliLibraryIds')}
             options={ping?.libraries?.map(({ section_id, section_name }) => ({
               label: section_name,
               value: section_id,
             }))}
-            onChange={setProperty('tautlliLibraryIds')}
             required
             values={settings?.tautlliLibraryIds}
           />

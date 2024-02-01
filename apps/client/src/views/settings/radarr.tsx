@@ -1,9 +1,13 @@
-import type { RadarrPing, RadarrSettings } from '@usharr/types'
+import type {
+  RadarrPing,
+  RadarrSettings,
+  RadarrSettingsDTO,
+} from '@usharr/types'
 import React from 'react'
 
 import Alert from '../../components/alert'
 import Button from '../../components/button'
-import { Actions, Field, Form, Label, Input } from '../../components/form'
+import { Actions, Field, Form, Input, Label } from '../../components/form'
 import Section, { Title } from '../../components/section'
 import { useCreate, useFetch } from '../../hooks/useApi'
 import useAsyncState from '../../hooks/useAsyncState'
@@ -14,8 +18,8 @@ export default function Radarr(): JSX.Element {
     useFetch<RadarrSettings>('/api/settings/radarr')
   const { data: pingData, loading: pingLoading } =
     useFetch<RadarrPing>('/api/radarr/ping')
-  const { create } = useCreate<RadarrSettings>('/api/settings/radarr')
-  const { create: postPing } = useCreate<RadarrSettings, RadarrPing>(
+  const { create } = useCreate<RadarrSettingsDTO>('/api/settings/radarr')
+  const { create: postPing } = useCreate<RadarrSettingsDTO, RadarrPing>(
     '/api/radarr/ping',
   )
   const { create: radarrSync } = useCreate('/api/sync/radarr')
@@ -65,8 +69,8 @@ export default function Radarr(): JSX.Element {
             <a
               className="border-b border-dashed"
               href="https://wiki.servarr.com/radarr/settings#file-management"
-              target="_blank"
-              rel="noreferrer">
+              rel="noreferrer"
+              target="_blank">
               enabling it
             </a>{' '}
             to prevent unintentional data loss.

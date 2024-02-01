@@ -67,8 +67,8 @@ export function A({ children, className, href, ...variants }: AProps) {
     <a
       className={cx(getVariants({ ...variants, underline: true }), className)}
       href={href}
-      target="_blank"
-      rel="noopener noreferrer">
+      rel="noopener noreferrer"
+      target="_blank">
       {children}
     </a>
   )

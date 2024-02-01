@@ -32,8 +32,8 @@ export function Toast({ message, type = 'info' }: ToastModel): JSX.Element {
       className={cx(
         'pointer-events-none ml-auto mt-4 flex w-[fit-content] max-w-lg items-center justify-center rounded-lg px-6 py-4 pl-4 shadow-lg transition-all',
         {
-          'bg-red text-white': type === 'error',
           'bg-purple text-white': type === 'info',
+          'bg-red text-white': type === 'error',
           'translate-x-0 opacity-100': visible,
           'translate-x-full opacity-0': !visible,
         },

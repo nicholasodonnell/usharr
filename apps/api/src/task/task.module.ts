@@ -6,9 +6,9 @@ import { SyncModule } from '../sync/sync.module'
 import { TaskService } from './task.service'
 
 @Module({
-  imports: [SettingsModule, SyncModule],
   controllers: [],
-  providers: [TaskService],
   exports: [TaskService],
+  imports: [SettingsModule, SyncModule],
+  providers: [TaskService],
 })
 export class TaskModule {}

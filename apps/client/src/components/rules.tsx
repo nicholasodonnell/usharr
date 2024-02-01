@@ -13,14 +13,14 @@ export type RulesProps = {
 
 export type RuleProps = {
   availableTags: Tag[]
-  onSubmit: (RuleModel) => Promise<void>
   onDelete: (RuleModel) => Promise<void>
+  onSubmit: (RuleModel) => Promise<void>
   rule: RuleModel
 }
 
 export type NewRuleProps = {
-  onSubmit: (RuleModel) => Promise<void>
   availableTags: Tag[]
+  onSubmit: (RuleModel) => Promise<void>
 }
 
 export function NewRule({
@@ -57,8 +57,8 @@ export function NewRule({
 
 export function Rule({
   availableTags,
-  onSubmit,
   onDelete,
+  onSubmit,
   rule,
 }: RuleProps): JSX.Element {
   const [modalOpen, setModalOpen] = useState<boolean>(false)
@@ -88,7 +88,7 @@ export function Rule({
           <div>
             {rule.downloadedDaysAgo && (
               <div className="grid grid-cols-4">
-                <P className="col-span-3" bold>
+                <P bold className="col-span-3">
                   Download Age
                 </P>
                 <P className="truncate">
@@ -99,7 +99,7 @@ export function Rule({
             )}
             {rule.watched !== null && (
               <div className="grid grid-cols-4">
-                <P className="col-span-3" bold>
+                <P bold className="col-span-3">
                   Watched
                 </P>
                 <P className="truncate">{rule.watched ? 'Yes' : 'No'}</P>
@@ -107,7 +107,7 @@ export function Rule({
             )}
             {rule.watchedDaysAgo && (
               <div className="grid grid-cols-4">
-                <P className="col-span-3" bold>
+                <P bold className="col-span-3">
                   Last Watched
                 </P>
                 <P className="truncate">
@@ -118,7 +118,7 @@ export function Rule({
             )}
             {rule.appearsInList !== null && (
               <div className="grid grid-cols-4">
-                <P className="col-span-3" bold>
+                <P bold className="col-span-3">
                   In Lists
                 </P>
                 <P className="truncate">
@@ -130,7 +130,7 @@ export function Rule({
             )}
             {rule.minimumImdbRating && (
               <div className="grid grid-cols-4">
-                <P className="col-span-3" bold>
+                <P bold className="col-span-3">
                   IMDB Rating Less Than
                 </P>
                 <P className="truncate">{rule.minimumImdbRating}%</P>
@@ -138,7 +138,7 @@ export function Rule({
             )}
             {rule.minimumTmdbRating && (
               <div className="grid grid-cols-4">
-                <P className="col-span-3" bold>
+                <P bold className="col-span-3">
                   TMDB Rating Less Than
                 </P>
                 <P className="truncate">{rule.minimumTmdbRating}%</P>
@@ -146,7 +146,7 @@ export function Rule({
             )}
             {rule.minimumMetacriticRating && (
               <div className="grid grid-cols-4">
-                <P className="col-span-3" bold>
+                <P bold className="col-span-3">
                   Metacritic Rating Less Than
                 </P>
                 <P className="truncate">{rule.minimumMetacriticRating}%</P>
@@ -154,7 +154,7 @@ export function Rule({
             )}
             {rule.minimumRottenTomatoesRating && (
               <div className="grid grid-cols-4">
-                <P className="col-span-3" bold>
+                <P bold className="col-span-3">
                   Rotten Tomatoes Rating Less Than
                 </P>
                 <P className="truncate">{rule.minimumRottenTomatoesRating}%</P>
@@ -162,7 +162,7 @@ export function Rule({
             )}
             {rule.tags?.length > 0 && (
               <div className="grid grid-cols-4">
-                <P className="col-span-3" bold>
+                <P bold className="col-span-3">
                   Tags
                 </P>
                 <P className="truncate">
@@ -191,8 +191,8 @@ export function RulesSkeleton(): JSX.Element {
     <>
       {Array.from({ length: 3 }).map((_, index) => (
         <div
-          key={index}
           className="flex h-80 w-full animate-pulse flex-col items-center justify-center rounded-md bg-app-background shadow"
+          key={index}
         />
       ))}
     </>
