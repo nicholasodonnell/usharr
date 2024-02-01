@@ -190,7 +190,10 @@ export class MovieService {
 
     return new Movie({
       ...movie,
-      daysUntilDeletion: daysUntilDeletion === Infinity ? 0 : daysUntilDeletion,
+      daysUntilDeletion:
+        daysUntilDeletion === Infinity || daysUntilDeletion < 0
+          ? 0
+          : daysUntilDeletion,
       matchedRule: rule,
     })
   }
