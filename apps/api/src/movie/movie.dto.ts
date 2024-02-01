@@ -1,7 +1,7 @@
 import { OmitType } from '@nestjs/swagger'
 import type { MovieDTO as IMovieDTO } from '@usharr/types'
 import { Type } from 'class-transformer'
-import { IsArray, ValidateNested } from 'class-validator'
+import { IsArray, IsOptional, ValidateNested } from 'class-validator'
 
 import { TagDTO } from '../tag/tag.dto'
 
@@ -18,7 +18,8 @@ export class MovieDTO
   implements IMovieDTO
 {
   @IsArray()
-  @ValidateNested()
+  @IsOptional()
   @Type(() => TagDTO)
+  @ValidateNested()
   tags: TagDTO[]
 }

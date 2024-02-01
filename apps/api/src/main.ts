@@ -21,7 +21,12 @@ async function bootstrap() {
   app.use(morgan(isProd ? 'combined' : 'dev'))
 
   // pipes
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: { enableImplicitConversion: true },
+    }),
+  )
 
   // interceptors
   app.useGlobalInterceptors(new ErrorInterceptor())
