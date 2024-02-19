@@ -7,7 +7,6 @@ export type Settings = {
   radarrUrl: string | null
   syncDays: number
   syncHour: number
-  tautlliLibraryIds: number[] | null
   tautulliApiKey: string | null
   tautulliUrl: string | null
   updatedAt: Date
@@ -15,9 +14,9 @@ export type Settings = {
 
 export type GeneralSettings = Pick<Settings, 'enabled' | 'syncDays' | 'syncHour'>
 export type RadarrSettings = Pick<Settings, 'radarrApiKey' | 'radarrUrl' | 'radarrAddImportListExclusion'>
-export type TautulliSettings = Pick<Settings, 'tautlliLibraryIds' | 'tautulliApiKey' | 'tautulliUrl'>
+export type TautulliSettings = Pick<Settings, 'tautulliApiKey' | 'tautulliUrl'>
 
 export type SettingsDTO = Omit<Settings, 'id' | 'createdAt' | 'updatedAt'>
 export type GeneralSettingsDTO = Pick<SettingsDTO, 'enabled' | 'syncDays' | 'syncHour'>
 export type RadarrSettingsDTO = Pick<SettingsDTO, 'radarrApiKey' | 'radarrUrl' | 'radarrAddImportListExclusion'>
-export type TautulliSettingsDTO = Pick<SettingsDTO, 'tautlliLibraryIds' | 'tautulliApiKey' | 'tautulliUrl'>
+export type TautulliSettingsDTO = Pick<SettingsDTO, 'tautulliApiKey' | 'tautulliUrl'>

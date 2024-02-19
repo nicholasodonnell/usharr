@@ -29,7 +29,6 @@ export class SettingsService implements OnModuleInit {
     radarrUrl: true,
   }
   readonly tautulliSettingsSelect: Prisma.SettingsSelect = {
-    tautlliLibraryIds: true,
     tautulliApiKey: true,
     tautulliUrl: true,
   }
@@ -44,10 +43,9 @@ export class SettingsService implements OnModuleInit {
   }
 
   private serializeTautulliRecord(record): TautulliSettings {
-    const { tautlliLibraryIds, tautulliApiKey, tautulliUrl } = record
+    const { tautulliApiKey, tautulliUrl } = record
 
     return new TautulliSettings({
-      tautlliLibraryIds: tautlliLibraryIds?.split(',').map(Number) ?? [],
       tautulliApiKey,
       tautulliUrl,
     })
@@ -179,9 +177,8 @@ export class SettingsService implements OnModuleInit {
     settings: TautulliSettingsDTO,
   ): Promise<TautulliSettings> {
     try {
-      const { tautlliLibraryIds, tautulliApiKey, tautulliUrl } = settings
+      const { tautulliApiKey, tautulliUrl } = settings
       const data = {
-        tautlliLibraryIds: tautlliLibraryIds?.join(',') ?? undefined,
         tautulliApiKey,
         tautulliUrl,
       }

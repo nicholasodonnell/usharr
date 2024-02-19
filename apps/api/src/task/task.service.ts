@@ -26,7 +26,9 @@ export class TaskService {
       const { enabled, syncDays, syncHour }: GeneralSettings =
         await this.settings.getGeneral()
       const runningSyncs: Sync[] = await this.sync.getRunning()
-      const lastFullSync: Sync | null = await this.sync.getLastFull()
+      const lastFullSync: Sync | null = await this.sync.getLast(
+        SyncService.FULL,
+      )
       const now: Date = new Date()
 
       if (runningSyncs.length > 0) {
