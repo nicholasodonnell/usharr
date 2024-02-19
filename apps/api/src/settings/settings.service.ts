@@ -24,6 +24,7 @@ export class SettingsService implements OnModuleInit {
     syncHour: true,
   }
   readonly radarrSettingsSelect: Prisma.SettingsSelect = {
+    radarrAddImportListExclusion: true,
     radarrApiKey: true,
     radarrUrl: true,
   }
@@ -154,8 +155,8 @@ export class SettingsService implements OnModuleInit {
    */
   async updateRadarr(settings: RadarrSettingsDTO): Promise<RadarrSettings> {
     try {
-      const { radarrApiKey, radarrUrl } = settings
-      const data = { radarrApiKey, radarrUrl }
+      const { radarrAddImportListExclusion, radarrApiKey, radarrUrl } = settings
+      const data = { radarrAddImportListExclusion, radarrApiKey, radarrUrl }
 
       const record = await this.update<RadarrSettings>({
         select: this.radarrSettingsSelect,

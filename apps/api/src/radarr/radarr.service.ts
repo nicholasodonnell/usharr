@@ -44,10 +44,11 @@ export class RadarrService {
   ): Promise<void> {
     try {
       const client = await this.createClient(radarrSettings)
+      const settings = radarrSettings ?? (await this.settings.getRadarr())
 
       await client.delete(`/api/v3/movie/${movieId}`, {
         params: {
-          addImportExclusion: true,
+          addImportExclusion: settings.radarrAddImportListExclusion,
           deleteFiles: true,
         },
       })

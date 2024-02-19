@@ -30,6 +30,10 @@ export class Settings implements ISettings {
   id: number
 
   @ApiProperty()
+  @IsBoolean()
+  radarrAddImportListExclusion: boolean
+
+  @ApiProperty()
   @IsString()
   @IsOptional()
   radarrApiKey: null | string
@@ -83,7 +87,11 @@ export class GeneralSettings
 }
 
 export class RadarrSettings
-  extends PickType(Settings, ['radarrApiKey', 'radarrUrl'])
+  extends PickType(Settings, [
+    'radarrApiKey',
+    'radarrUrl',
+    'radarrAddImportListExclusion',
+  ])
   implements IRadarrSettings
 {
   constructor(partial: Partial<RadarrSettings>) {
