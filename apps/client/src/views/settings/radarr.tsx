@@ -1,9 +1,6 @@
-import type {
-  RadarrPing,
-  RadarrSettings,
-  RadarrSettingsDTO,
-} from '@usharr/types'
 import React from 'react'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { toast } from 'react-toastify'
 
 import Alert from '../../components/alert'
 import Button from '../../components/button'
@@ -16,39 +13,55 @@ import {
   Label,
 } from '../../components/form'
 import Section, { Title } from '../../components/section'
-import { useCreate, useFetch } from '../../hooks/useApi'
 import useAsyncState from '../../hooks/useAsyncState'
-import { useToast } from '../../hooks/useToast'
+import {
+  getRadarrSettings,
+  pingRadarr,
+  postPingRadarr,
+  syncRadarr,
+  updateRadarrSettings,
+} from '../../lib/api'
 
 export default function Radarr(): JSX.Element {
-  const { data: settingsData, loading: settingsLoading } =
-    useFetch<RadarrSettings>('/api/settings/radarr')
-  const { data: pingData, loading: pingLoading } =
-    useFetch<RadarrPing>('/api/radarr/ping')
-  const { create } = useCreate<RadarrSettingsDTO>('/api/settings/radarr')
-  const { create: postPing } = useCreate<RadarrSettingsDTO, RadarrPing>(
-    '/api/radarr/ping',
+  const queryClient = useQueryClient()
+
+  const { data: settingsData, isLoading: settingsLoading } = useQuery(
+    'settings/radarr',
+    getRadarrSettings,
   )
-  const { create: radarrSync } = useCreate('/api/sync/radarr')
-  const [settings, setSettings] = useAsyncState<RadarrSettings>(settingsData)
-  const [ping, setPing] = useAsyncState<RadarrPing>(pingData)
-  const { addToast } = useToast()
+
+  const { data: pingData, isLoading: pingLoading } = useQuery(
+    'radarr/ping',
+    pingRadarr,
+  )
+
+  const { mutateAsync: postPing } = useMutation(postPingRadarr)
+
+  const { mutateAsync: update } = useMutation(updateRadarrSettings, {
+    onSettled: () => {
+      queryClient.invalidateQueries('settings/radarr')
+    },
+  })
+
+  const { mutateAsync: radarrSync } = useMutation(syncRadarr)
+
+  const [settings, setSettings] = useAsyncState(settingsData)
+  const [ping, setPing] = useAsyncState(pingData)
 
   const handlePing = async () => {
     const pingResponse = await postPing(settings)
     setPing(pingResponse)
 
-    addToast({
-      message: pingResponse?.success
-        ? 'Radarr connection established successfully'
-        : 'Radarr connection failed',
-      type: pingResponse?.success ? 'info' : 'error',
-    })
+    if (pingResponse?.success) {
+      return toast.success('Radarr connection established successfully')
+    }
+
+    return toast.error('Radarr connection failed')
   }
 
   const handleSubmit = async () => {
-    await create(settings)
-    addToast({ message: 'Radarr settings saved' })
+    await update(settings)
+    toast.success('Radarr settings saved')
 
     await radarrSync()
   }

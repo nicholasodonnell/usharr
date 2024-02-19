@@ -1,14 +1,15 @@
-import type { Movie as MovieModel } from '@usharr/types'
 import React, { useState } from 'react'
+import { useQuery } from 'react-query'
 
 import { Input } from '../../components/form'
 import Movies, { Movie } from '../../components/movies'
 import Section, { Title } from '../../components/section'
-import { useFetch } from '../../hooks/useApi'
+import { getDeletedMovies } from '../../lib/api'
 
 export default function Deleted(): JSX.Element {
-  const { data: movies, loading } = useFetch<MovieModel[]>(
-    '/api/movies/deleted',
+  const { data: movies, isLoading } = useQuery(
+    'movies/deleted',
+    getDeletedMovies,
   )
   const [search, setSearch] = useState<string>('')
 
@@ -21,7 +22,7 @@ export default function Deleted(): JSX.Element {
         placeholder="Search"
         value={search}
       />
-      <Movies loading={loading}>
+      <Movies loading={isLoading}>
         {movies
           ?.filter((movie) =>
             search

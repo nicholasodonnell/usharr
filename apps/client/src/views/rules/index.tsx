@@ -1,44 +1,72 @@
-import type { RuleDTO, Rule as RuleModel, Tag } from '@usharr/types'
+import type { RuleDTO, Rule as RuleModel } from '@usharr/types'
 import React from 'react'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { toast } from 'react-toastify'
 
 import Rules, { NewRule, Rule } from '../../components/rules'
 import Section, { Title } from '../../components/section'
-import { useCreate, useDestroy, useFetch, useMutate } from '../../hooks/useApi'
-import { useToast } from '../../hooks/useToast'
+import {
+  createRule,
+  deleteRule,
+  getRules,
+  getTags,
+  updateRule,
+} from '../../lib/api'
 
 export default function Index(): JSX.Element {
-  const { data: rules, fetch, loading } = useFetch<RuleModel[]>('/api/rules')
-  const { data: tags, loading: tagsLoading } = useFetch<Tag[]>('/api/tags')
-  const { create } = useCreate<RuleDTO, RuleModel>('/api/rules')
-  const { mutate } = useMutate<RuleDTO, RuleModel>('/api/rules/:id')
-  const { destroy } = useDestroy('/api/rules/:id')
-  const { addToast } = useToast()
+  const queryClient = useQueryClient()
+
+  const {
+    data: rules,
+    isLoading: rulesLoading,
+    refetch,
+  } = useQuery('rules', getRules)
+
+  const { data: tags, isLoading: tagsLoading } = useQuery('tags', getTags)
+
+  const { mutateAsync: create } = useMutation(createRule, {
+    onSettled: () => {
+      queryClient.invalidateQueries('rules')
+    },
+  })
+
+  const { mutateAsync: update } = useMutation(updateRule, {
+    onSettled: () => {
+      queryClient.invalidateQueries('rules')
+    },
+  })
+
+  const { mutateAsync: destroy } = useMutation(deleteRule, {
+    onSettled: () => {
+      queryClient.invalidateQueries('rules')
+    },
+  })
 
   const handleEdit = async (rule: RuleModel) => {
-    await mutate(rule.id, rule)
-    addToast({ message: 'Rule saved' })
+    await update(rule)
+    toast.success('Rule saved')
 
-    await fetch()
+    await refetch()
   }
 
-  const handleCreate = async (rule: RuleModel) => {
+  const handleCreate = async (rule: RuleDTO) => {
     await create(rule)
-    addToast({ message: 'Rule saved' })
+    toast.success('Rule created')
 
-    await fetch()
+    await refetch()
   }
 
   const handleDelete = async (rule: RuleModel) => {
     await destroy(rule.id)
-    addToast({ message: 'Rule deleted' })
+    toast.success('Rule deleted')
 
-    await fetch()
+    await refetch()
   }
 
   return (
     <Section>
       <Title>Rules</Title>
-      <Rules loading={loading || tagsLoading}>
+      <Rules loading={rulesLoading || tagsLoading}>
         {rules?.map((rule) => (
           <Rule
             availableTags={tags}

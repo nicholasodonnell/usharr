@@ -10,6 +10,9 @@
 
 body {
   background-color: var(--app-background-light);
+  --toastify-color-info: var(--app-background-light);
+  --toastify-color-success: theme('colors.purple');;
+  --toastify-color-error: theme('colors.red');
 }
 
 

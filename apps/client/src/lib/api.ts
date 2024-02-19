@@ -1,42 +1,126 @@
-import axios from 'axios'
-import type { AxiosInstance, AxiosResponse, Method } from 'axios'
+import type {
+  GeneralSettings,
+  GeneralSettingsDTO,
+  Movie,
+  MovieDTO,
+  RadarrPing,
+  RadarrSettings,
+  RadarrSettingsDTO,
+  Rule,
+  RuleDTO,
+  Tag,
+  TautulliPing,
+  TautulliSettings,
+  TautulliSettingsDTO,
+} from '@usharr/types'
 
-export type Request<Data> = {
-  data?: Data
-  method?: Method
-  params?: Record<string, unknown>
-  url: string
-}
+import request from './request'
 
-export type API = <T>(Request) => Promise<T>
+export const getMonitoredMovies = () =>
+  request<Movie[]>({
+    method: 'GET',
+    url: '/api/movies/monitored',
+  })
 
-const request: AxiosInstance = axios.create({
-  baseURL:
-    process.env.NODE_ENV === 'production'
-      ? '/'
-      : `http://${window.location.hostname}:3001`,
-})
+export const getDeletedMovies = () =>
+  request<Movie[]>({
+    method: 'GET',
+    url: '/api/movies/deleted',
+  })
 
-export default async function api<Data, Response = Data>({
-  data,
-  method = 'GET',
-  params = {},
-  url,
-}: Request<Data>): Promise<Response> {
-  try {
-    const response: AxiosResponse<Response> = await request({
-      data,
-      method,
-      params,
-      url,
-    })
+export const getIgnoredMovies = () =>
+  request<Movie[]>({
+    method: 'GET',
+    url: '/api/movies/ignored',
+  })
 
-    return response.data
-  } catch (e) {
-    const { message } = e.response?.data || {}
-    const errorMessage = message ?? `An unexpected error occurred`
-    const error = new Error(errorMessage, { cause: e })
+export const updateMovie = (movie: MovieDTO) =>
+  request<MovieDTO, Movie>({
+    data: movie,
+    method: 'PUT',
+    url: `/api/movies/${movie.id}`,
+  })
 
-    throw error
-  }
-}
+export const getRules = () =>
+  request<Rule[]>({
+    method: 'GET',
+    url: '/api/rules',
+  })
+
+export const updateRule = (rule: RuleDTO & { id: number }) =>
+  request<RuleDTO, Rule>({
+    data: rule,
+    method: 'PUT',
+    url: `/api/rules/${rule.id}`,
+  })
+
+export const createRule = (rule: RuleDTO) =>
+  request<RuleDTO, Rule>({
+    data: rule,
+    method: 'POST',
+    url: '/api/rules',
+  })
+
+export const deleteRule = (id: number) =>
+  request<void, void>({
+    method: 'DELETE',
+    url: `/api/rules/${id}`,
+  })
+
+export const getTags = () => request<Tag[]>({ method: 'GET', url: '/api/tags' })
+
+export const getSettings = () =>
+  request<GeneralSettings>({ method: 'GET', url: '/api/settings/general' })
+
+export const updateSettings = (settings: GeneralSettingsDTO) =>
+  request<GeneralSettingsDTO, GeneralSettings>({
+    data: settings,
+    method: 'POST',
+    url: '/api/settings/general',
+  })
+
+export const getRadarrSettings = () =>
+  request<RadarrSettings>({ method: 'GET', url: '/api/settings/radarr' })
+
+export const updateRadarrSettings = (settings: RadarrSettingsDTO) =>
+  request<RadarrSettingsDTO, RadarrSettings>({
+    data: settings,
+    method: 'POST',
+    url: '/api/settings/radarr',
+  })
+
+export const pingRadarr = () =>
+  request<RadarrPing>({ method: 'GET', url: '/api/radarr/ping' })
+
+export const postPingRadarr = (settings: RadarrSettingsDTO) =>
+  request<RadarrSettingsDTO, RadarrPing>({
+    data: settings,
+    method: 'POST',
+    url: '/api/radarr/ping',
+  })
+
+export const syncRadarr = () =>
+  request<void>({ method: 'POST', url: '/api/sync/radarr' })
+
+export const getTautulliSettings = () =>
+  request<TautulliSettings>({ method: 'GET', url: '/api/settings/tautulli' })
+
+export const updateTautulliSettings = (settings: TautulliSettingsDTO) =>
+  request<TautulliSettingsDTO, TautulliSettings>({
+    data: settings,
+    method: 'POST',
+    url: '/api/settings/tautulli',
+  })
+
+export const pingTautulli = () =>
+  request<TautulliPing>({ method: 'GET', url: '/api/radarr/ping' })
+
+export const postPingTautulli = (settings: TautulliSettingsDTO) =>
+  request<TautulliSettingsDTO, TautulliPing>({
+    data: settings,
+    method: 'POST',
+    url: '/api/tautulli/ping',
+  })
+
+export const syncTautulli = () =>
+  request<void>({ method: 'POST', url: '/api/sync/tautulli' })
