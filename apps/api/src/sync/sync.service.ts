@@ -270,11 +270,9 @@ export class SyncService {
           deletedAt: null,
           downloadedAt: radarrMovie.movieFile?.dateAdded,
           id: radarrMovie.id,
-          ignored: false,
           imdbRating: radarrMovie.ratings?.imdb?.value
             ? Math.floor(radarrMovie.ratings.imdb.value * 10)
             : null,
-          lastWatchedAt: null,
           metacriticRating: radarrMovie.ratings?.metacritic?.value
             ? Math.floor(radarrMovie.ratings.metacritic.value)
             : null,
@@ -290,7 +288,6 @@ export class SyncService {
           tmdbRating: radarrMovie.ratings?.tmdb?.value
             ? Math.floor(radarrMovie.ratings.tmdb.value * 10)
             : null,
-          watched: false,
         })
 
         this.logger.log(`Synced movie "${movie.title}"`)
