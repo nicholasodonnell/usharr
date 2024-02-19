@@ -7,7 +7,14 @@ import React from 'react'
 
 import Alert from '../../components/alert'
 import Button from '../../components/button'
-import { Actions, Field, Form, Input, Label } from '../../components/form'
+import {
+  Actions,
+  Checkbox,
+  Field,
+  Form,
+  Input,
+  Label,
+} from '../../components/form'
 import Section, { Title } from '../../components/section'
 import { useCreate, useFetch } from '../../hooks/useApi'
 import useAsyncState from '../../hooks/useAsyncState'
@@ -100,6 +107,17 @@ export default function Radarr(): JSX.Element {
             required
             type="password"
             value={settings?.radarrApiKey}
+          />
+        </Field>
+        <Field>
+          <Label className="col-span-1">
+            Exclude movies from list imports when deleted?
+          </Label>
+          <Checkbox
+            className="col-span-3"
+            disabled={settingsLoading || pingLoading}
+            onChange={setProperty('radarrAddImportListExclusion')}
+            value={settings?.radarrAddImportListExclusion}
           />
         </Field>
         <Actions>
