@@ -7,11 +7,10 @@ import type {
   RadarrPing,
   RadarrTag,
   Rule,
-  Sync,
   SyncType,
   Tag,
+  TautulliHistory,
   TautulliPing,
-  TautulliWatchHistory,
 } from '@usharr/types'
 
 import { MovieService } from '../movie/movie.service'
@@ -20,6 +19,8 @@ import { RadarrService } from '../radarr/radarr.service'
 import { RuleService } from '../rule/rule.service'
 import { TagService } from '../tag/tag.service'
 import { TautulliService } from '../tautulli/tautulli.service'
+
+import { Sync } from './sync.model'
 
 const select: Prisma.SyncSelect = {
   finishedAt: true,
@@ -91,12 +92,12 @@ export class SyncService {
   private serializeRecord(record): Sync {
     const { finishedAt, id, startedAt, type } = record
 
-    return {
-      finishedAt: finishedAt ? new Date(startedAt) : null,
+    return new Sync({
+      finishedAt: finishedAt ? new Date(finishedAt) : null,
       id,
       startedAt: new Date(startedAt),
       type,
-    }
+    })
   }
 
   private async update(params: {
@@ -146,10 +147,12 @@ export class SyncService {
    */
   async finish(id: number): Promise<Sync> {
     try {
-      return await this.update({
+      const record = await this.update({
         data: { finishedAt: new Date() },
         where: { id },
       })
+
+      return this.serializeRecord(record)
     } catch (e) {
       const error = new Error(`Failed to finish sync: ${e.message}`)
       this.logger.error(error)
@@ -162,7 +165,7 @@ export class SyncService {
    * Performs a FULL sync:
    * - update all movies
    * - update all tags
-   * - update watch history
+   * - update watch history since the beginning of time
    * - delete movies for rules
    */
   async full(): Promise<void> {
@@ -172,9 +175,11 @@ export class SyncService {
       this.logger.log('Starting full sync')
       sync = await this.start(SyncService.FULL)
 
+      const lastSync: Sync | null = await this.getLast()
+
       await this.tags()
       await this.movies()
-      await this.watchHistory()
+      await this.watchHistory(lastSync?.finishedAt)
       await this.deleteMovies()
 
       this.logger.log('Finished full sync')
@@ -193,13 +198,13 @@ export class SyncService {
   /**
    * Returns the last finished FULL sync
    */
-  async getLastFull(): Promise<Sync | null> {
+  async getLast(type?: SyncType): Promise<Sync | null> {
     try {
-      return this.findFirst({
+      return await this.findFirst({
         orderBy: { finishedAt: 'desc' },
         where: {
           finishedAt: { not: null },
-          type: SyncService.FULL,
+          ...(type ? { type } : {}),
         },
       })
     } catch (e) {
@@ -306,7 +311,7 @@ export class SyncService {
    * Performs a PARTIAL sync:
    * - update all movies
    * - update all tags
-   * - update watch history
+   * - update watch history since the last sync
    */
   async partial(): Promise<void> {
     let sync: Sync = null
@@ -315,9 +320,11 @@ export class SyncService {
       this.logger.log('Starting partial sync')
       sync = await this.start(SyncService.PARTIAL)
 
+      const lastSync: Sync | null = await this.getLast()
+
       await this.tags()
       await this.movies()
-      await this.watchHistory()
+      await this.watchHistory(lastSync?.finishedAt)
 
       this.logger.log('Finished partial sync')
     } catch (e) {
@@ -337,10 +344,12 @@ export class SyncService {
    */
   async start(type: SyncType): Promise<Sync> {
     try {
-      return await this.create({
+      const record = await this.create({
         startedAt: new Date(),
         type,
       })
+
+      return this.serializeRecord(record)
     } catch (e) {
       const error = new Error(`Failed to start sync: ${e.message}`)
       this.logger.error(error)
@@ -386,11 +395,7 @@ export class SyncService {
     }
   }
 
-  /**
-   * Sync the watch status of all non-deleted movies from Tautulli
-   * Syncing is done by searching the Tautulli history for the movie title(s)
-   */
-  async watchHistory(): Promise<void> {
+  async watchHistory(since: Date = new Date(0)): Promise<void> {
     try {
       const ping: TautulliPing = await this.tautulli.ping()
 
@@ -399,36 +404,25 @@ export class SyncService {
       }
 
       const moviesToSync: Movie[] = await this.movie.getNotDeleted()
+      const watchHistory: TautulliHistory[] = await this.tautulli.getHistory(
+        since,
+      )
 
-      for await (const movieToSync of moviesToSync) {
-        const watchHistory: TautulliWatchHistory[] =
-          await this.tautulli.getWatchHistoryFromAllLibrariesForTitles([
-            movieToSync.title,
-            ...movieToSync.alternativeTitles,
-          ])
+      for (const movie of moviesToSync) {
+        const titles = [movie.title, ...movie.alternativeTitles]
 
-        if (watchHistory.length === 0) {
-          this.logger.warn(`No watch history found for "${movieToSync.title}"`)
+        const history: TautulliHistory | undefined = watchHistory.find(
+          (history) => titles.includes(history.title),
+        )
 
+        if (!history) {
           continue
         }
 
-        const watched = watchHistory.some(
-          (item: TautulliWatchHistory) => item.watched,
-        )
-
-        const lastWatchedAt = watched
-          ? new Date(
-              Math.max(
-                ...watchHistory.map((item) => item.lastWatchedAt.getTime()),
-              ),
-            )
-          : null
-
-        const movie: Movie = await this.movie.createOrUpdate({
-          ...movieToSync,
-          lastWatchedAt,
-          watched,
+        await this.movie.createOrUpdate({
+          ...movie,
+          lastWatchedAt: history.date,
+          watched: true,
         })
 
         this.logger.log(`Synced watch history for "${movie.title}"`)

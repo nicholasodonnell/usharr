@@ -55,7 +55,6 @@ model Settings {
   radarrAddImportListExclusion Boolean  @default(true)
   tautulliUrl                  String?
   tautulliApiKey               String?
-  tautlliLibraryIds            String?
   enabled                      Boolean  @default(false)
   syncDays                     Int?     @default(1)
   syncHour                     Int?     @default(3)

@@ -7,14 +7,7 @@ import React from 'react'
 
 import Alert from '../../components/alert'
 import Button from '../../components/button'
-import {
-  Actions,
-  Field,
-  Form,
-  Input,
-  Label,
-  MultipleSelect,
-} from '../../components/form'
+import { Actions, Field, Form, Input, Label } from '../../components/form'
 import Section, { Title } from '../../components/section'
 import { useCreate, useFetch } from '../../hooks/useApi'
 import useAsyncState from '../../hooks/useAsyncState'
@@ -96,27 +89,6 @@ export default function Tautulli(): JSX.Element {
             value={settings?.tautulliApiKey}
           />
         </Field>
-        <Field>
-          <Label className="col-span-1" required>
-            Libraries
-          </Label>
-          <MultipleSelect<null | number>
-            className="col-span-3"
-            disabled={
-              settingsLoading ||
-              pingLoading ||
-              !ping?.libraries ||
-              ping?.libraries?.length === 0
-            }
-            onChange={setProperty('tautlliLibraryIds')}
-            options={ping?.libraries?.map(({ section_id, section_name }) => ({
-              label: section_name,
-              value: section_id,
-            }))}
-            required
-            values={settings?.tautlliLibraryIds}
-          />
-        </Field>
         <Actions>
           <Button
             disabled={settingsLoading || pingLoading}
@@ -129,8 +101,7 @@ export default function Tautulli(): JSX.Element {
               settingsLoading ||
               pingLoading ||
               !settings?.tautulliUrl ||
-              !settings?.tautulliApiKey ||
-              settings?.tautlliLibraryIds?.length < 1
+              !settings?.tautulliApiKey
             }
             type="submit">
             Save

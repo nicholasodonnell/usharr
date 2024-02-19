@@ -52,12 +52,6 @@ export class Settings implements ISettings {
   syncHour: number
 
   @ApiProperty()
-  @IsArray()
-  @IsNumber({}, { each: true })
-  @IsOptional()
-  tautlliLibraryIds: null | number[]
-
-  @ApiProperty()
   @IsString()
   @IsOptional()
   tautulliApiKey: null | string
@@ -101,11 +95,7 @@ export class RadarrSettings
 }
 
 export class TautulliSettings
-  extends PickType(Settings, [
-    'tautlliLibraryIds',
-    'tautulliApiKey',
-    'tautulliUrl',
-  ])
+  extends PickType(Settings, ['tautulliApiKey', 'tautulliUrl'])
   implements ITautulliSettings
 {
   constructor(partial: Partial<TautulliSettings>) {
