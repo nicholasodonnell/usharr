@@ -11,7 +11,7 @@ import { ErrorInterceptor } from './interceptor/error.interceptor'
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
   const isProd = process.env.NODE_ENV === 'production'
-  const port = isProd ? 1225 : 3001
+  const port = isProd ? 5588 : 3001
 
   if (!isProd) {
     app.enableCors()
