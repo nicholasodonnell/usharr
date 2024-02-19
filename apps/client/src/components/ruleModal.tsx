@@ -26,6 +26,10 @@ export type RuleModalProps = {
   values?: Rule
 }
 
+const defaultRule: Partial<Rule> = {
+  enabled: false,
+}
+
 export default function RuleModal({
   availableTags = [],
   onClose,
@@ -35,7 +39,7 @@ export default function RuleModal({
   title,
   values,
 }: RuleModalProps): JSX.Element {
-  const [rule, setRule] = useState<Rule>(values || ({} as Rule))
+  const [rule, setRule] = useState<Rule>(values || (defaultRule as Rule))
 
   const setProperty = (property: string) => (value: any) => {
     setRule({
