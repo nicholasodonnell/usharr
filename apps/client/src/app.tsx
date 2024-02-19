@@ -3,7 +3,6 @@ import { Route, Routes } from 'react-router-dom'
 
 import Redirect from './components/redirect'
 import Toasts from './components/toasts'
-import { useToast } from './hooks/useToast'
 import Page from './views/_layout/page'
 import Deleted from './views/movies/deleted'
 import Ignored from './views/movies/ignored'
@@ -14,8 +13,6 @@ import Radarr from './views/settings/radarr'
 import Tautulli from './views/settings/tautulli'
 
 export default function App(): JSX.Element {
-  const { toasts } = useToast()
-
   return (
     <>
       <Routes>
@@ -37,7 +34,7 @@ export default function App(): JSX.Element {
           <Route element={<Redirect to="/" />} path="*" />
         </Route>
       </Routes>
-      <Toasts toasts={toasts} />
+      <Toasts />
     </>
   )
 }

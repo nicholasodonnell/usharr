@@ -1,27 +1,32 @@
 import type { Movie as MovieModel } from '@usharr/types'
 import React, { useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { toast } from 'react-toastify'
 
 import { Input } from '../../components/form'
 import Movies, { Movie } from '../../components/movies'
 import Section, { Title } from '../../components/section'
-import { useFetch, useMutate } from '../../hooks/useApi'
-import { useToast } from '../../hooks/useToast'
+import { getMonitoredMovies, updateMovie } from '../../lib/api'
 
 export default function Monitored(): JSX.Element {
+  const queryClient = useQueryClient()
   const {
     data: movies,
-    fetch,
-    loading,
-  } = useFetch<MovieModel[]>('/api/movies/monitored')
-  const { mutate } = useMutate<MovieModel>('/api/movies/:id')
-  const { addToast } = useToast()
+    isLoading,
+    refetch,
+  } = useQuery('movies/monitored', getMonitoredMovies)
+  const { mutateAsync } = useMutation(updateMovie, {
+    onSettled: () => {
+      queryClient.invalidateQueries('movies')
+    },
+  })
   const [search, setSearch] = useState<string>('')
 
   const handleIgnore = async (movie: MovieModel) => {
-    await mutate(movie.id, { ...movie, ignored: true })
-    addToast({ message: 'Movie ignored' })
+    await mutateAsync({ ...movie, ignored: true })
+    toast.success(`Ignored ${movie.title}`)
 
-    await fetch()
+    await refetch()
   }
 
   return (
@@ -33,7 +38,7 @@ export default function Monitored(): JSX.Element {
         placeholder="Search"
         value={search}
       />
-      <Movies loading={loading}>
+      <Movies loading={isLoading}>
         {movies
           ?.filter((movie) =>
             search

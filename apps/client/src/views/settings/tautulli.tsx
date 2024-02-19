@@ -1,47 +1,60 @@
-import type {
-  TautulliPing,
-  TautulliSettings,
-  TautulliSettingsDTO,
-} from '@usharr/types'
 import React from 'react'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { toast } from 'react-toastify'
 
 import Alert from '../../components/alert'
 import Button from '../../components/button'
 import { Actions, Field, Form, Input, Label } from '../../components/form'
 import Section, { Title } from '../../components/section'
-import { useCreate, useFetch } from '../../hooks/useApi'
 import useAsyncState from '../../hooks/useAsyncState'
-import { useToast } from '../../hooks/useToast'
+import {
+  getTautulliSettings,
+  pingTautulli,
+  postPingTautulli,
+  syncTautulli,
+  updateTautulliSettings,
+} from '../../lib/api'
 
 export default function Tautulli(): JSX.Element {
-  const { data: settingsData, loading: settingsLoading } =
-    useFetch<TautulliSettings>('/api/settings/tautulli')
-  const { data: pingData, loading: pingLoading } =
-    useFetch<TautulliPing>('/api/tautulli/ping')
-  const { create } = useCreate<TautulliSettingsDTO>('/api/settings/tautulli')
-  const { create: postPing } = useCreate<TautulliSettingsDTO, TautulliPing>(
-    '/api/tautulli/ping',
+  const queryClient = useQueryClient()
+
+  const { data: settingsData, isLoading: settingsLoading } = useQuery(
+    'settings/tautulli',
+    getTautulliSettings,
   )
-  const { create: tautulliSync } = useCreate('/api/sync/tautulli')
-  const [settings, setSettings] = useAsyncState<TautulliSettings>(settingsData)
-  const [ping, setPing] = useAsyncState<TautulliPing>(pingData)
-  const { addToast } = useToast()
+
+  const { data: pingData, isLoading: pingLoading } = useQuery(
+    'tautulli/ping',
+    pingTautulli,
+  )
+
+  const { mutateAsync: postPing } = useMutation(postPingTautulli)
+
+  const { mutateAsync: update } = useMutation(updateTautulliSettings, {
+    onSettled: () => {
+      queryClient.invalidateQueries('settings/tautulli')
+    },
+  })
+
+  const { mutateAsync: tautulliSync } = useMutation(syncTautulli)
+
+  const [settings, setSettings] = useAsyncState(settingsData)
+  const [ping, setPing] = useAsyncState(pingData)
 
   const handlePing = async () => {
     const pingResponse = await postPing(settings)
     setPing(pingResponse)
 
-    addToast({
-      message: pingResponse?.success
-        ? 'Tautulli connection established successfully'
-        : 'Tautulli connection failed',
-      type: pingResponse?.success ? 'info' : 'error',
-    })
+    if (pingResponse?.success) {
+      return toast.success('Tautulli connection established successfully')
+    }
+
+    return toast.error('Tautulli connection failed')
   }
 
   const handleSubmit = async () => {
-    await create(settings)
-    addToast({ message: 'Tautulli settings saved' })
+    await update(settings)
+    toast.success('Tautulli settings saved')
 
     await tautulliSync()
   }

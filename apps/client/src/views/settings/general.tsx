@@ -1,5 +1,6 @@
-import type { GeneralSettings, GeneralSettingsDTO } from '@usharr/types'
 import React from 'react'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { toast } from 'react-toastify'
 
 import Button from '../../components/button'
 import {
@@ -12,19 +13,25 @@ import {
   Select,
 } from '../../components/form'
 import Section, { Title } from '../../components/section'
-import { useCreate, useFetch } from '../../hooks/useApi'
 import useApiState from '../../hooks/useAsyncState'
-import { useToast } from '../../hooks/useToast'
+import { getSettings, updateSettings } from '../../lib/api'
 
 export default function General(): JSX.Element {
-  const { data, loading } = useFetch<GeneralSettings>('/api/settings/general')
-  const { create } = useCreate<GeneralSettingsDTO>('/api/settings/general')
-  const [settings, setSettings] = useApiState<GeneralSettings>(data)
-  const { addToast } = useToast()
+  const queryClient = useQueryClient()
+
+  const { data, isLoading } = useQuery('settings/general', getSettings)
+
+  const { mutateAsync: update } = useMutation(updateSettings, {
+    onSettled: () => {
+      queryClient.invalidateQueries('settings')
+    },
+  })
+
+  const [settings, setSettings] = useApiState(data)
 
   const handleSubmit = async () => {
-    await create(settings)
-    addToast({ message: 'Settings saved' })
+    await update(settings)
+    toast.success('Settings saved')
   }
 
   const setProperty = (property: string) => (value: any) => {
@@ -37,12 +44,12 @@ export default function General(): JSX.Element {
   return (
     <Section>
       <Title>Settings &#8212; General</Title>
-      <Form disabled={loading} onSubmit={handleSubmit}>
+      <Form disabled={isLoading} onSubmit={handleSubmit}>
         <Field>
           <Label className="col-span-1">Enabled</Label>
           <Checkbox
             className="col-span-3"
-            disabled={loading}
+            disabled={isLoading}
             onChange={setProperty('enabled')}
             value={settings?.enabled}
           />
@@ -51,7 +58,7 @@ export default function General(): JSX.Element {
           <Label className="col-span-1">Sync frequency (Days)</Label>
           <NumberInput
             className="col-span-3"
-            disabled={loading}
+            disabled={isLoading}
             max={365}
             min={1}
             onChange={setProperty('syncDays')}
@@ -63,7 +70,7 @@ export default function General(): JSX.Element {
           <Label className="col-span-1">Sync Time</Label>
           <Select<number>
             className="col-span-3"
-            disabled={loading}
+            disabled={isLoading}
             onChange={setProperty('syncHour')}
             options={[
               { label: '0:00', value: 0 },
@@ -96,7 +103,7 @@ export default function General(): JSX.Element {
           />
         </Field>
         <Actions>
-          <Button disabled={loading} type="submit">
+          <Button disabled={isLoading} type="submit">
             Save
           </Button>
         </Actions>
