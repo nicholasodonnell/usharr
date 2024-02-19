@@ -201,7 +201,7 @@ export class MovieService {
   /**
    * Create a new movie record if one does not exist, otherwise update the existing record
    */
-  async createOrUpdate(movie: MovieDTO): Promise<Movie> {
+  async createOrUpdate(movie: Partial<MovieDTO>): Promise<Movie> {
     try {
       const {
         alternativeTitles,
