@@ -175,9 +175,11 @@ export class SyncService {
       this.logger.log('Starting full sync')
       sync = await this.start(SyncService.FULL)
 
+      const lastSync: Sync | null = await this.getLast()
+
       await this.tags()
       await this.movies()
-      await this.watchHistory()
+      await this.watchHistory(lastSync?.finishedAt)
       await this.deleteMovies()
 
       this.logger.log('Finished full sync')
