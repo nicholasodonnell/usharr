@@ -124,7 +124,7 @@ export default function Radarr(): JSX.Element {
         </Field>
         <Field>
           <Label className="col-span-1">
-            Exclude movies from list imports when deleted?
+            Exclude deleted movies from Radarr lists?
           </Label>
           <Checkbox
             className="col-span-3"

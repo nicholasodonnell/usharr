@@ -174,14 +174,18 @@ export default function RuleModal({
           </Field>
           <Field>
             <Label className="col-span-1">Radarr Tags</Label>
-            <MultipleSelect<Tag | null>
+            <MultipleSelect<null | number>
               className="col-span-3"
-              onChange={setProperty('tags')}
+              onChange={(ids) =>
+                setProperty('tags')(
+                  availableTags.filter((tag) => ids.includes(tag.id)),
+                )
+              }
               options={availableTags.map((tag: Tag) => ({
                 label: tag.name,
-                value: tag,
+                value: tag.id,
               }))}
-              values={rule?.tags}
+              values={rule?.tags?.map((tag: Tag) => tag.id) || []}
             />
           </Field>
           <Actions>

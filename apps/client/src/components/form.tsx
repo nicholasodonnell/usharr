@@ -277,9 +277,7 @@ export function MultipleSelect<T>({
         <option
           disabled={disabled}
           key={option.label}
-          selected={values
-            ?.map((val) => JSON.stringify(val))
-            ?.includes(JSON.stringify(option.value))}>
+          selected={values?.includes(option.value)}>
           {option.label}
         </option>
       ))}
