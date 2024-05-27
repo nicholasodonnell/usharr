@@ -6,7 +6,6 @@ import type {
   TautulliSettings as ITautulliSettings,
 } from '@usharr/types'
 import {
-  IsArray,
   IsBoolean,
   IsDate,
   IsNotEmpty,
