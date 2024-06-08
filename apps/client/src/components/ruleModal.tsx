@@ -61,7 +61,7 @@ export default function RuleModal({
       <Section>
         <Title>{title}</Title>
         <Description>
-          Movies that match all these rules will be deleted.
+          Movies must match <strong>all</strong> rules.
         </Description>
         <Form onSubmit={handleSubmit}>
           <Field>

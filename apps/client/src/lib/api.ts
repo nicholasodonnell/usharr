@@ -22,6 +22,12 @@ export const getMonitoredMovies = () =>
     url: '/api/movies/monitored',
   })
 
+export const getUnmonitoredMovies = () =>
+  request<Movie[]>({
+    method: 'GET',
+    url: '/api/movies/unmonitored',
+  })
+
 export const getDeletedMovies = () =>
   request<Movie[]>({
     method: 'GET',

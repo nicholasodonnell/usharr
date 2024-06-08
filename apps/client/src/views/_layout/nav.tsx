@@ -98,6 +98,7 @@ export default function Nav(): JSX.Element {
           <ul className="grid grid-cols-1 gap-6">
             <TopNav icon={<Movie />} title="Movies" to="/movies">
               <SubNav title="Monitored" to="/movies/monitored" />
+              <SubNav title="Unmonitored" to="/movies/unmonitored" />
               <SubNav title="Ignored" to="/movies/ignored" />
               <SubNav title="Deleted" to="/movies/deleted" />
             </TopNav>

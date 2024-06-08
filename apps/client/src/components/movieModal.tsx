@@ -46,7 +46,7 @@ export default function MovieModal({
         <Form>
           {movie?.deleted && (
             <Alert className="mb-2" error>
-              Deleted On {new Date(movie.deletedAt).toLocaleDateString()}
+              Deleted {new Date(movie.deletedAt).toLocaleDateString()}
             </Alert>
           )}
           <div className="flex w-full flex-1 flex-row">
@@ -64,14 +64,14 @@ export default function MovieModal({
               </div>
               {movie.lastWatchedAt && (
                 <div className="grid grid-cols-2 gap-4">
-                  <P bold>Last Watched At</P>
+                  <P bold>Last Watched</P>
                   <P className="break-words">
                     {new Date(movie.lastWatchedAt).toLocaleDateString()}
                   </P>
                 </div>
               )}
               <div className="grid grid-cols-2 gap-4">
-                <P bold>Downloaded At</P>
+                <P bold>Downloaded</P>
                 <P className="break-words">
                   {new Date(movie.downloadedAt).toLocaleDateString()}
                 </P>
@@ -120,14 +120,15 @@ export default function MovieModal({
                   <P className="break-words">{movie.matchedRule.name}</P>
                 </div>
               )}
-              {movie.daysUntilDeletion && movie.daysUntilDeletion !== null && (
-                <div className="grid grid-cols-2 gap-4">
-                  <P bold>Time Remaining</P>
-                  <P bold className="break-words text-red">
-                    {movie.daysUntilDeletion} days
-                  </P>
-                </div>
-              )}
+              {!!movie.daysUntilDeletion &&
+                movie.daysUntilDeletion !== null && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <P bold>Days Remaining</P>
+                    <P bold className="break-words text-red">
+                      {movie.daysUntilDeletion} days
+                    </P>
+                  </div>
+                )}
             </div>
           </div>
           <Actions>

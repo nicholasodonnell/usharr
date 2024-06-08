@@ -7,6 +7,7 @@ import Page from './views/_layout/page'
 import Deleted from './views/movies/deleted'
 import Ignored from './views/movies/ignored'
 import Monitored from './views/movies/monitored'
+import Unmonitored from './views/movies/unmonitored'
 import Rules from './views/rules'
 import General from './views/settings/general'
 import Radarr from './views/settings/radarr'
@@ -21,6 +22,7 @@ export default function App(): JSX.Element {
           <Route path="movies">
             <Route element={<Redirect to="/movies/monitored" />} index />
             <Route element={<Monitored />} path="monitored" />
+            <Route element={<Unmonitored />} path="unmonitored" />
             <Route element={<Ignored />} path="ignored" />
             <Route element={<Deleted />} path="deleted" />
           </Route>

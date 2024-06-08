@@ -165,8 +165,8 @@ export class SyncService {
    * Performs a FULL sync:
    * - update all movies
    * - update all tags
-   * - update watch history since the beginning of time
-   * - delete movies for rules
+   * - update watch history
+   * - delete movies
    */
   async full(): Promise<void> {
     let sync: Sync = null

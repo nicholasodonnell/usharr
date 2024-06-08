@@ -17,36 +17,53 @@ export class TaskService {
     private sync: SyncService,
   ) {}
 
+  private async shouldDoFullSync(): Promise<boolean> {
+    const { enabled, syncDays, syncHour }: GeneralSettings =
+      await this.settings.getGeneral()
+    const lastFullSync: Sync | null = await this.sync.getLast(SyncService.FULL)
+    const now: Date = new Date()
+    const isProduction: boolean = process.env.NODE_ENV === 'production'
+
+    // don't run in development
+    if (!isProduction) {
+      return false
+    }
+
+    // sync setting is not enabled
+    if (!enabled) {
+      return false
+    }
+
+    // sync hour does not match current hour
+    if (syncHour !== now.getHours()) {
+      return false
+    }
+
+    // no last full sync exists
+    if (!lastFullSync) {
+      return true
+    }
+
+    // last full sync finished more than sync days ago
+    return (
+      now.getTime() - lastFullSync.finishedAt.getTime() >= syncDays * ONE_DAY_MS
+    )
+  }
+
   /**
    * Performs either a FULL or PARTIAL sync depending on user settings
    */
   @Cron('0 * * * *')
   async runSync(): Promise<void> {
     try {
-      const { enabled, syncDays, syncHour }: GeneralSettings =
-        await this.settings.getGeneral()
       const runningSyncs: Sync[] = await this.sync.getRunning()
-      const lastFullSync: Sync | null = await this.sync.getLast(
-        SyncService.FULL,
-      )
-      const now: Date = new Date()
+      const shouldDoFullSync: boolean = await this.shouldDoFullSync()
 
       if (runningSyncs.length > 0) {
         this.logger.warn('Sync already running, skipping')
 
         return
       }
-
-      // a full sync should be done when:
-      // - sync setting is enabled
-      // - sync hour matches current hour
-      // - no last full sync exists
-      // - last full sync finished more than sync days ago
-      const shouldDoFullSync: boolean =
-        (enabled && syncHour === now.getHours() && !lastFullSync) ||
-        (lastFullSync?.finishedAt &&
-          now.getTime() - lastFullSync.finishedAt.getTime() >=
-            syncDays * ONE_DAY_MS)
 
       if (shouldDoFullSync) {
         return await this.sync.full()
