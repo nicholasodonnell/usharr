@@ -33,7 +33,7 @@ export class Movie implements IMovie {
   @ApiProperty()
   @IsOptional()
   @IsNumber()
-  daysUntilDeletion: null | number
+  daysUntilDeletion: number | undefined
 
   @ApiProperty()
   @IsBoolean()
@@ -72,7 +72,7 @@ export class Movie implements IMovie {
   @Type(() => Rule)
   @IsOptional()
   @ValidateNested({ each: true })
-  matchedRule: Rule | null
+  matchedRule: Rule | undefined
 
   @ApiProperty()
   @IsNumber()

@@ -4,18 +4,18 @@ import { useQuery } from 'react-query'
 import { Input } from '../../components/form'
 import Movies, { Movie } from '../../components/movies'
 import Section, { Title } from '../../components/section'
-import { getDeletedMovies } from '../../lib/api'
+import { getUnmonitoredMovies } from '../../lib/api'
 
-export default function Deleted(): JSX.Element {
+export default function Unmonitored(): JSX.Element {
   const { data: movies, isLoading } = useQuery(
-    'movies/deleted',
-    getDeletedMovies,
+    'movies/unmonitored',
+    getUnmonitoredMovies,
   )
   const [search, setSearch] = useState<string>('')
 
   return (
     <Section>
-      <Title>Deleted</Title>
+      <Title>Unmonitored</Title>
       <Input
         className="mb-4 w-full"
         onChange={setSearch}

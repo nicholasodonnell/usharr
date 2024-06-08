@@ -1,4 +1,5 @@
 import type { Movie as MovieModel } from '@usharr/types'
+import cx from 'classnames'
 import React, { useState } from 'react'
 
 import MovieModal from './movieModal'
@@ -10,11 +11,17 @@ export type MoviesProps = {
 
 export type MovieProps = {
   action?: string
+  className?: string
   movie: MovieModel
   onAction?: (movie: MovieModel) => Promise<void>
 }
 
-export function Movie({ action, movie, onAction }: MovieProps): JSX.Element {
+export function Movie({
+  action,
+  className,
+  movie,
+  onAction,
+}: MovieProps): JSX.Element {
   const [modalOpen, setModalOpen] = useState<boolean>(false)
 
   const handleAction = async (movie: MovieModel) => {
@@ -25,7 +32,10 @@ export function Movie({ action, movie, onAction }: MovieProps): JSX.Element {
   return (
     <div>
       <a
-        className="relative block w-full cursor-pointer overflow-hidden rounded-md border border-app-background-accent bg-app-background shadow transition-all hover:scale-105 hover:shadow-lg"
+        className={cx(
+          'relative block w-full cursor-pointer overflow-hidden rounded-md border border-app-background-accent bg-app-background shadow transition-all hover:scale-105 hover:shadow-lg',
+          className,
+        )}
         onClick={() => setModalOpen(true)}>
         <img
           alt={movie.title}
@@ -44,8 +54,14 @@ export function Movie({ action, movie, onAction }: MovieProps): JSX.Element {
         {movie.daysUntilDeletion !== null &&
           movie.daysUntilDeletion !== undefined && (
             <span className="font-small absolute left-2 top-2 z-30 rounded-lg border-[1px] border-app-background-accent bg-red p-1 text-sm uppercase text-white shadow-lg">
-              {movie.daysUntilDeletion} day
-              {movie.daysUntilDeletion !== 1 && 's'}
+              {movie.daysUntilDeletion > 0 ? (
+                <>
+                  {movie.daysUntilDeletion} day
+                  {movie.daysUntilDeletion !== 1 && 's'}
+                </>
+              ) : (
+                'Next Sync'
+              )}
             </span>
           )}
       </a>

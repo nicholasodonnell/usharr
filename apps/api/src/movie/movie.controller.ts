@@ -33,6 +33,12 @@ export class MovieController {
     return this.movie.getMonitored()
   }
 
+  @ApiOkResponse({ type: [Movie] })
+  @Get('unmonitored')
+  async getUnmonitored(): Promise<Movie[]> {
+    return this.movie.getUnmonitored()
+  }
+
   @ApiOkResponse({ type: Movie })
   @Put(':id')
   async update(

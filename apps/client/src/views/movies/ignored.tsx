@@ -38,7 +38,7 @@ export default function Ignored(): JSX.Element {
 
   return (
     <Section>
-      <Title>Movies &#8212; Ignored</Title>
+      <Title>Ignored</Title>
       <Input
         className="mb-4 w-full"
         onChange={setSearch}

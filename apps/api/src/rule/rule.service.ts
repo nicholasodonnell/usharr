@@ -244,7 +244,11 @@ export class RuleService {
    */
   async getAll(): Promise<Rule[]> {
     try {
-      return await this.findMany()
+      return await this.findMany({
+        orderBy: {
+          createdAt: 'asc',
+        },
+      })
     } catch (e) {
       const error = new Error(`Failed to get all rules: ${e.message}`)
       this.logger.error(error)
@@ -258,7 +262,12 @@ export class RuleService {
    */
   async getEnabled(): Promise<Rule[]> {
     try {
-      return await this.findMany({ where: { enabled: true } })
+      return await this.findMany({
+        orderBy: {
+          createdAt: 'asc',
+        },
+        where: { enabled: true },
+      })
     } catch (e) {
       const error = new Error(`Failed to get enabled rules: ${e.message}`)
       this.logger.error(error)

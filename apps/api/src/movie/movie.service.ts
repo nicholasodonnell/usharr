@@ -74,6 +74,84 @@ export class MovieService {
     return records.map(this.serializeRecord)
   }
 
+  private getDaysUntilDeletion(movie: Movie, rule: Rule): number {
+    const {
+      appearsInList: movieAppearsInList,
+      downloadedAt,
+      imdbRating,
+      lastWatchedAt,
+      metacriticRating,
+      rottenTomatoesRating,
+      tmdbRating,
+      watched: movieWatched,
+    } = movie
+    const {
+      appearsInList: ruleAppearsInList,
+      downloadedDaysAgo,
+      minimumImdbRating,
+      minimumMetacriticRating,
+      minimumRottenTomatoesRating,
+      minimumTmdbRating,
+      watched: ruleWatched,
+      watchedDaysAgo,
+    } = rule
+
+    if (
+      ruleAppearsInList !== null &&
+      movieAppearsInList !== ruleAppearsInList
+    ) {
+      return Infinity
+    }
+
+    if (minimumImdbRating && imdbRating && imdbRating >= minimumImdbRating) {
+      return Infinity
+    }
+
+    if (
+      minimumMetacriticRating &&
+      metacriticRating &&
+      metacriticRating >= minimumMetacriticRating
+    ) {
+      return Infinity
+    }
+
+    if (
+      minimumRottenTomatoesRating &&
+      rottenTomatoesRating &&
+      rottenTomatoesRating >= minimumRottenTomatoesRating
+    ) {
+      return Infinity
+    }
+
+    if (minimumTmdbRating && tmdbRating && tmdbRating >= minimumTmdbRating) {
+      return Infinity
+    }
+
+    if (ruleWatched !== null && movieWatched !== ruleWatched) {
+      return Infinity
+    }
+
+    if (!downloadedDaysAgo && !watchedDaysAgo) {
+      return 0
+    }
+
+    if (downloadedDaysAgo && !watchedDaysAgo) {
+      return Math.max(0, downloadedDaysAgo - daysSince(downloadedAt))
+    }
+
+    if (!downloadedDaysAgo && watchedDaysAgo) {
+      return Math.max(0, watchedDaysAgo - daysSince(lastWatchedAt))
+    }
+
+    return Math.max(
+      Math.min(
+        downloadedDaysAgo - daysSince(downloadedAt),
+        watchedDaysAgo - daysSince(lastWatchedAt),
+      ),
+      0,
+    )
+  }
+
   private serializeRecord(record): Movie {
     const {
       alternativeTitles,
@@ -172,29 +250,6 @@ export class MovieService {
       })
 
       return this.serializeRecord(record)
-    })
-  }
-
-  private withComputed(movie: Movie, rule: Rule): Movie {
-    const { downloadedAt, lastWatchedAt } = movie
-    const { downloadedDaysAgo, watchedDaysAgo } = rule
-
-    const daysUntilDeletion = Math.min(
-      downloadedDaysAgo
-        ? downloadedDaysAgo - daysSince(downloadedAt)
-        : Infinity,
-      watchedDaysAgo && lastWatchedAt
-        ? watchedDaysAgo - daysSince(lastWatchedAt)
-        : Infinity,
-    )
-
-    return new Movie({
-      ...movie,
-      daysUntilDeletion:
-        daysUntilDeletion === Infinity || daysUntilDeletion < 0
-          ? 0
-          : daysUntilDeletion,
-      matchedRule: rule,
     })
   }
 
@@ -315,7 +370,11 @@ export class MovieService {
    */
   async getAll(): Promise<Movie[]> {
     try {
-      return await this.findMany()
+      return await this.findMany({
+        orderBy: {
+          downloadedAt: 'desc',
+        },
+      })
     } catch (e) {
       const error = new Error(`Failed to get all movies: ${e.message}`)
       this.logger.error(error.message)
@@ -329,7 +388,10 @@ export class MovieService {
    */
   async getDeleted(): Promise<Movie[]> {
     try {
-      return await this.findMany({ where: { deleted: true } })
+      return await this.findMany({
+        orderBy: { deletedAt: 'desc' },
+        where: { deleted: true },
+      })
     } catch (e) {
       const error = new Error(`Failed to get deleted movies: ${e.message}`)
       this.logger.error(error.message)
@@ -340,9 +402,13 @@ export class MovieService {
 
   /**
    * Returns a list of movies that match the provided rule
-   * @param ignoreVariable If true, variable rules (downloadedDaysAgo, watchedDaysAgo) will be ignored
    */
-  async getForRule(rule: Rule, ignoreVariable = false): Promise<Movie[]> {
+  async getForRule(
+    rule: Rule,
+    opts?: { ignoreDynamic: boolean },
+  ): Promise<Movie[]> {
+    const { ignoreDynamic = false } = opts || {}
+
     try {
       const {
         appearsInList,
@@ -357,36 +423,39 @@ export class MovieService {
       } = rule
 
       const where: Prisma.MovieWhereInput = {
-        appearsInList: appearsInList ?? undefined,
+        appearsInList: !ignoreDynamic ? appearsInList ?? undefined : undefined,
         deleted: false,
         downloadedAt:
-          !ignoreVariable && downloadedDaysAgo
+          !ignoreDynamic && downloadedDaysAgo
             ? {
                 lte: new Date(Date.now() - downloadedDaysAgo * ONE_DAY_MS),
               }
             : undefined,
         ignored: false,
-        imdbRating: minimumImdbRating
-          ? {
-              lte: minimumImdbRating,
-            }
-          : undefined,
+        imdbRating:
+          !ignoreDynamic && minimumImdbRating
+            ? {
+                lte: minimumImdbRating,
+              }
+            : undefined,
         lastWatchedAt:
-          !ignoreVariable && watchedDaysAgo
+          !ignoreDynamic && watchedDaysAgo
             ? {
                 lte: new Date(Date.now() - watchedDaysAgo * ONE_DAY_MS),
               }
             : undefined,
-        metacriticRating: minimumMetacriticRating
-          ? {
-              lte: minimumMetacriticRating,
-            }
-          : undefined,
-        rottenTomatoesRating: minimumRottenTomatoesRating
-          ? {
-              lte: minimumRottenTomatoesRating,
-            }
-          : undefined,
+        metacriticRating:
+          !ignoreDynamic && minimumMetacriticRating
+            ? {
+                lte: minimumMetacriticRating,
+              }
+            : undefined,
+        rottenTomatoesRating:
+          !ignoreDynamic && minimumRottenTomatoesRating
+            ? {
+                lte: minimumRottenTomatoesRating,
+              }
+            : undefined,
         tags: tags.length
           ? {
               some: {
@@ -396,12 +465,13 @@ export class MovieService {
               },
             }
           : undefined,
-        tmdbRating: minimumTmdbRating
-          ? {
-              lte: minimumTmdbRating,
-            }
-          : undefined,
-        watched: watched ?? undefined,
+        tmdbRating:
+          !ignoreDynamic && minimumTmdbRating
+            ? {
+                lte: minimumTmdbRating,
+              }
+            : undefined,
+        watched: !ignoreDynamic ? watched ?? undefined : undefined,
       }
 
       return await this.findMany({ where })
@@ -418,17 +488,15 @@ export class MovieService {
    */
   async getIgnored(): Promise<Movie[]> {
     try {
-      const monitored = await this.getMonitored()
-      const monitoredIds = monitored.map((movie) => movie.id)
-
-      const where: Prisma.MovieWhereInput = {
-        deleted: false,
-        id: {
-          notIn: monitoredIds,
+      return await this.findMany({
+        orderBy: {
+          downloadedAt: 'desc',
         },
-      }
-
-      return await this.findMany({ where })
+        where: {
+          deleted: false,
+          ignored: true,
+        },
+      })
     } catch (e) {
       const error = new Error(`Failed to get ignored movies: ${e.message}`)
       this.logger.error(error.message)
@@ -438,11 +506,7 @@ export class MovieService {
   }
 
   /**
-   * Returns a list of monitored movies. Monitored movies are movies that match at least one rule excluding:
-   * - movies that are explicitly ignored
-   * - movies that are deleted
-   * - last watched age (variable)
-   * - download age (variable)
+   * Returns a list of monitored movies. Monitored movies are movies that match at least one rule
    */
   async getMonitored(): Promise<Movie[]> {
     try {
@@ -450,8 +514,14 @@ export class MovieService {
       const moviesMap: Record<number, Movie> = {}
 
       for (const rule of enabledRules) {
-        const records: Movie[] = await this.getForRule(rule, true)
-        const movies = records.map((movie) => this.withComputed(movie, rule))
+        const records: Movie[] = await this.getForRule(rule, {
+          ignoreDynamic: true,
+        })
+        const movies = records.map((movie) => ({
+          ...movie,
+          daysUntilDeletion: this.getDaysUntilDeletion(movie, rule),
+          matchedRule: rule,
+        }))
 
         // dedupe movies based on `daysUntilDeletion`
         for (const movie of movies) {
@@ -487,6 +557,31 @@ export class MovieService {
       return await this.findMany({ where: { deleted: false } })
     } catch (e) {
       const error = new Error(`Failed to get not deleted movies: ${e.message}`)
+      this.logger.error(error.message)
+
+      throw error
+    }
+  }
+
+  async getUnmonitored(): Promise<Movie[]> {
+    try {
+      const monitoredMovies: Movie[] = await this.getMonitored()
+      const monitoredIds: number[] = monitoredMovies.map((movie) => movie.id)
+
+      return await this.findMany({
+        orderBy: {
+          downloadedAt: 'desc',
+        },
+        where: {
+          deleted: false,
+          id: {
+            notIn: monitoredIds,
+          },
+          ignored: false,
+        },
+      })
+    } catch (e) {
+      const error = new Error(`Failed to get unmonitored movies: ${e.message}`)
       this.logger.error(error.message)
 
       throw error
