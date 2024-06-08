@@ -22,8 +22,14 @@ export class RuleController {
 
   @ApiOkResponse({ type: [Rule] })
   @Get()
-  async get(): Promise<Rule[]> {
+  async getAll(): Promise<Rule[]> {
     return await this.ruleService.getAll()
+  }
+
+  @ApiOkResponse({ type: Rule })
+  @Get(':id')
+  async getOne(@Param('id') id: string): Promise<Rule> {
+    return await this.ruleService.getById(+id)
   }
 
   @ApiOkResponse({ type: Rule })

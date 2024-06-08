@@ -263,7 +263,7 @@ export function MultipleSelect<T>({
     <select
       autoComplete="off"
       className={cx(
-        'h-52 w-full rounded-md border border-app-background-accent bg-app-background px-4 py-2 text-xl transition-colors focus:border-pink focus:outline-none ',
+        'h-72 w-full rounded-md border border-app-background-accent bg-app-background px-4 py-2 text-xl transition-colors focus:border-pink focus:outline-none ',
         {
           'pointer-events-none opacity-50': disabled,
         },
