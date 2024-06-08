@@ -165,7 +165,7 @@ export class SyncService {
    * Performs a FULL sync:
    * - update all movies
    * - update all tags
-   * - update watch history
+   * - update all watch history
    * - delete movies
    */
   async full(): Promise<void> {
@@ -175,11 +175,9 @@ export class SyncService {
       this.logger.log('Starting full sync')
       sync = await this.start(SyncService.FULL)
 
-      const lastSync: Sync | null = await this.getLast()
-
       await this.tags()
       await this.movies()
-      await this.watchHistory(lastSync?.finishedAt)
+      await this.watchHistory()
       await this.deleteMovies()
 
       this.logger.log('Finished full sync')
