@@ -53,6 +53,12 @@ export const getRules = () =>
     url: '/api/rules',
   })
 
+export const getRule = (id) =>
+  request<Rule>({
+    method: 'GET',
+    url: `/api/rules/${id}`,
+  })
+
 export const updateRule = (rule: RuleDTO & { id: number }) =>
   request<RuleDTO, Rule>({
     data: rule,

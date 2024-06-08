@@ -9,6 +9,8 @@ import Ignored from './views/movies/ignored'
 import Monitored from './views/movies/monitored'
 import Unmonitored from './views/movies/unmonitored'
 import Rules from './views/rules'
+import EditRule from './views/rules/[id]'
+import CreateRule from './views/rules/new'
 import General from './views/settings/general'
 import Radarr from './views/settings/radarr'
 import Tautulli from './views/settings/tautulli'
@@ -26,7 +28,11 @@ export default function App(): JSX.Element {
             <Route element={<Ignored />} path="ignored" />
             <Route element={<Deleted />} path="deleted" />
           </Route>
-          <Route element={<Rules />} path="rules" />
+          <Route path="rules">
+            <Route element={<Rules />} index />
+            <Route element={<EditRule />} path=":id" />
+            <Route element={<CreateRule />} path="new" />
+          </Route>
           <Route path="settings">
             <Route element={<Redirect to="/settings/general" />} index />
             <Route element={<General />} path="general" />

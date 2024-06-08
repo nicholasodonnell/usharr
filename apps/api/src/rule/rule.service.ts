@@ -66,6 +66,15 @@ export class RuleService {
     return records.map(this.serializeRecord)
   }
 
+  private async findOne(where: Prisma.RuleWhereUniqueInput): Promise<Rule> {
+    const record = await this.prisma.rule.findUnique({
+      select: this.select,
+      where,
+    })
+
+    return this.serializeRecord(record)
+  }
+
   private serializeRecord(record): Rule {
     const {
       appearsInList,
@@ -251,6 +260,19 @@ export class RuleService {
       })
     } catch (e) {
       const error = new Error(`Failed to get all rules: ${e.message}`)
+      this.logger.error(error)
+
+      throw error
+    }
+  }
+
+  async getById(id: number): Promise<Rule> {
+    try {
+      return await this.findOne({
+        id,
+      })
+    } catch (e) {
+      const error = new Error(`Failed to get rule: ${e.message}`)
       this.logger.error(error)
 
       throw error

@@ -1,9 +1,9 @@
-import type { Rule as RuleModel, Tag } from '@usharr/types'
+import type { Rule as RuleModel } from '@usharr/types'
 import cx from 'classnames'
-import React, { useState } from 'react'
+import React from 'react'
+import { Link } from 'react-router-dom'
 
 import { Plus } from './icon'
-import RuleModal from './ruleModal'
 import { H3, H4, P } from './text'
 
 export type RulesProps = {
@@ -12,77 +12,35 @@ export type RulesProps = {
 }
 
 export type RuleProps = {
-  availableTags: Tag[]
-  onDelete: (RuleModel) => Promise<void>
-  onSubmit: (RuleModel) => Promise<void>
   rule: RuleModel
 }
 
-export type NewRuleProps = {
-  availableTags: Tag[]
-  onSubmit: (RuleModel) => Promise<void>
-}
-
-export function NewRule({
-  availableTags,
-  onSubmit,
-}: NewRuleProps): JSX.Element {
-  const [modalOpen, setModalOpen] = useState<boolean>(false)
-
-  const handleSubmit = async (rule: RuleModel) => {
-    await onSubmit(rule)
-    setModalOpen(false)
-  }
-
+export function NewRule(): JSX.Element {
   return (
     <div>
-      <a
+      <Link
         className="flex-center flex h-80 w-full cursor-pointer rounded-md border-[1px] border-dashed border-app-background-accent bg-app-background shadow transition-all hover:border-solid hover:shadow-lg"
-        onClick={() => setModalOpen(true)}>
+        to="/rules/new">
         <div className="flex flex-1 flex-row justify-center self-center">
           <Plus className="mr-2 h-8 w-8" />
           <H4 className="leading-[32px]">New Rule</H4>
         </div>
-      </a>
-      <RuleModal
-        availableTags={availableTags}
-        onClose={() => setModalOpen(false)}
-        onSubmit={handleSubmit}
-        open={modalOpen}
-        title="New Rule"
-      />
+      </Link>
     </div>
   )
 }
 
-export function Rule({
-  availableTags,
-  onDelete,
-  onSubmit,
-  rule,
-}: RuleProps): JSX.Element {
-  const [modalOpen, setModalOpen] = useState<boolean>(false)
-
-  const handleSubmit = async (rule: RuleModel) => {
-    await onSubmit(rule)
-    setModalOpen(false)
-  }
-
-  const handleDelete = async (rule: RuleModel) => {
-    await onDelete(rule)
-    setModalOpen(false)
-  }
-
+export function Rule({ rule }: RuleProps): JSX.Element {
   return (
     <div>
-      <a
+      <Link
         className={cx(
           'flex h-80 w-full cursor-pointer items-baseline overflow-hidden rounded-md border-[1px] border-app-background-accent bg-app-background shadow transition-all hover:border-solid hover:shadow-lg',
           {
             'opacity-50': !rule.enabled,
           },
         )}
-        onClick={() => setModalOpen(true)}>
+        to={`/rules/${rule.id}`}>
         <div className="flex w-full flex-1 flex-col p-8">
           <H3 className="mb-4 truncate">{rule.name}</H3>
           <div>
@@ -172,16 +130,7 @@ export function Rule({
             )}
           </div>
         </div>
-      </a>
-      <RuleModal
-        availableTags={availableTags}
-        onClose={() => setModalOpen(false)}
-        onDelete={handleDelete}
-        onSubmit={handleSubmit}
-        open={modalOpen}
-        title="Edit Rule"
-        values={rule}
-      />
+      </Link>
     </div>
   )
 }
