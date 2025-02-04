@@ -1,4 +1,4 @@
-FROM node:18-buster-slim AS base
+FROM node:20-buster-slim AS base
 
 # default environment variables
 ENV \
