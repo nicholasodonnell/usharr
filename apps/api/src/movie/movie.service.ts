@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma.service'
 import { Rule } from '../rule/rule.model'
 import { RuleService } from '../rule/rule.service'
+import { SettingsService } from '../settings/settings.service'
 import { Tag } from '../tag/tag.model'
 import { daysSince } from '../util/daysSince'
 
@@ -51,6 +52,7 @@ export class MovieService {
   constructor(
     private prisma: PrismaService,
     private rule: RuleService,
+    private settings: SettingsService,
   ) {}
 
   private async findMany(
@@ -402,12 +404,15 @@ export class MovieService {
 
   /**
    * Returns a list of movies that match the provided rule
+   * @param opts.includeSoftMatch Include movies that match the rule will do not meet dynamic delete conditions (e.g. downloadedDaysAgo, watchedDaysAgo)
    */
   async getForRule(
     rule: Rule,
-    opts?: { ignoreDynamic: boolean },
+    opts?: { includeSoftMatch: boolean },
   ): Promise<Movie[]> {
-    const { ignoreDynamic = false } = opts || {}
+    const { includeSoftMatch = false } = opts || {}
+    const { treatSoftMatchAsUnmonitored } = await this.settings.getGeneral()
+    const ignoreDynamic = includeSoftMatch && !treatSoftMatchAsUnmonitored
 
     try {
       const {
@@ -426,34 +431,34 @@ export class MovieService {
         appearsInList: !ignoreDynamic ? appearsInList ?? undefined : undefined,
         deleted: false,
         downloadedAt:
-          !ignoreDynamic && downloadedDaysAgo
+          !includeSoftMatch && downloadedDaysAgo
             ? {
-                lte: new Date(Date.now() - downloadedDaysAgo * ONE_DAY_MS),
+                lt: new Date(Date.now() - downloadedDaysAgo * ONE_DAY_MS),
               }
             : undefined,
         ignored: false,
         imdbRating:
           !ignoreDynamic && minimumImdbRating
             ? {
-                lte: minimumImdbRating,
+                lt: minimumImdbRating,
               }
             : undefined,
         lastWatchedAt:
           !ignoreDynamic && watchedDaysAgo
             ? {
-                lte: new Date(Date.now() - watchedDaysAgo * ONE_DAY_MS),
+                lt: new Date(Date.now() - watchedDaysAgo * ONE_DAY_MS),
               }
             : undefined,
         metacriticRating:
           !ignoreDynamic && minimumMetacriticRating
             ? {
-                lte: minimumMetacriticRating,
+                lt: minimumMetacriticRating,
               }
             : undefined,
         rottenTomatoesRating:
           !ignoreDynamic && minimumRottenTomatoesRating
             ? {
-                lte: minimumRottenTomatoesRating,
+                lt: minimumRottenTomatoesRating,
               }
             : undefined,
         tags: tags.length
@@ -468,10 +473,10 @@ export class MovieService {
         tmdbRating:
           !ignoreDynamic && minimumTmdbRating
             ? {
-                lte: minimumTmdbRating,
+                lt: minimumTmdbRating,
               }
             : undefined,
-        watched: !ignoreDynamic ? watched ?? undefined : undefined,
+        watched: !includeSoftMatch ? watched ?? undefined : undefined,
       }
 
       return await this.findMany({ where })
@@ -515,7 +520,7 @@ export class MovieService {
 
       for (const rule of enabledRules) {
         const records: Movie[] = await this.getForRule(rule, {
-          ignoreDynamic: true,
+          includeSoftMatch: true,
         })
         const movies = records.map((movie) => ({
           ...movie,

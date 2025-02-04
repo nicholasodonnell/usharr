@@ -8,6 +8,7 @@ import {
   Checkbox,
   Field,
   Form,
+  Hint,
   Label,
   NumberInput,
   Select,
@@ -100,6 +101,22 @@ export default function General(): JSX.Element {
             ]}
             required
             value={settings?.syncHour}
+          />
+        </Field>
+        <Field>
+          <Label className="col-span-1">
+            Treat soft matches as unmonitored
+            <Hint className="mt-2">
+              Soft matches are movies that match a rule but cannot be given a
+              deletion date because of dynamic conditions such as watch status,
+              rating, etc.?
+            </Hint>
+          </Label>
+          <Checkbox
+            className="col-span-3"
+            disabled={isLoading}
+            onChange={setProperty('treatSoftMatchAsUnmonitored')}
+            value={settings?.treatSoftMatchAsUnmonitored}
           />
         </Field>
         <Actions>

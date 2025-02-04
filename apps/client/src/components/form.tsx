@@ -45,6 +45,11 @@ export type LabelPros = {
   required?: boolean
 }
 
+export type HintProps = {
+  children: React.ReactNode
+  className?: string
+}
+
 export type SelectOption<T> = {
   label: string
   value: T
@@ -131,6 +136,12 @@ export function Label({
         {required && <sup className="ml-1 text-red ">*</sup>}
       </span>
     </label>
+  )
+}
+
+export function Hint({ children, className }: HintProps): JSX.Element {
+  return (
+    <div className={cx('text-xs italic text-gray', className)}>{children}</div>
   )
 }
 

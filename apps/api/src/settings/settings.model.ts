@@ -61,6 +61,10 @@ export class Settings implements ISettings {
   tautulliUrl: null | string
 
   @ApiProperty()
+  @IsBoolean()
+  treatSoftMatchAsUnmonitored: boolean
+
+  @ApiProperty()
   @IsDate()
   updatedAt: Date
 
@@ -70,7 +74,12 @@ export class Settings implements ISettings {
 }
 
 export class GeneralSettings
-  extends PickType(Settings, ['enabled', 'syncDays', 'syncHour'])
+  extends PickType(Settings, [
+    'enabled',
+    'syncDays',
+    'syncHour',
+    'treatSoftMatchAsUnmonitored',
+  ])
   implements IGeneralSettings
 {
   constructor(partial: Partial<GeneralSettings>) {
