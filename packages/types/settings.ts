@@ -9,10 +9,11 @@ export type Settings = {
   syncHour: number
   tautulliApiKey: string | null
   tautulliUrl: string | null
+  treatSoftMatchAsUnmonitored: boolean
   updatedAt: Date
 }
 
-export type GeneralSettings = Pick<Settings, 'enabled' | 'syncDays' | 'syncHour'>
+export type GeneralSettings = Pick<Settings, 'enabled' | 'syncDays' | 'syncHour' | 'treatSoftMatchAsUnmonitored'>
 export type RadarrSettings = Pick<Settings, 'radarrApiKey' | 'radarrUrl' | 'radarrAddImportListExclusion'>
 export type TautulliSettings = Pick<Settings, 'tautulliApiKey' | 'tautulliUrl'>
 

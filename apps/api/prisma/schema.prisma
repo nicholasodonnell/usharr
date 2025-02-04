@@ -58,6 +58,7 @@ model Settings {
   enabled                      Boolean  @default(false)
   syncDays                     Int?     @default(1)
   syncHour                     Int?     @default(3)
+  treatSoftMatchAsUnmonitored  Boolean  @default(false)
   createdAt                    DateTime @default(now())
   updatedAt                    DateTime @updatedAt
 }

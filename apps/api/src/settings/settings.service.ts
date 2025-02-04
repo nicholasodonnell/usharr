@@ -22,6 +22,7 @@ export class SettingsService implements OnModuleInit {
     enabled: true,
     syncDays: true,
     syncHour: true,
+    treatSoftMatchAsUnmonitored: true,
   }
   readonly radarrSettingsSelect: Prisma.SettingsSelect = {
     radarrAddImportListExclusion: true,
@@ -131,8 +132,9 @@ export class SettingsService implements OnModuleInit {
    */
   async updateGeneral(settings: GeneralSettingsDTO): Promise<GeneralSettings> {
     try {
-      const { enabled, syncDays, syncHour } = settings
-      const data = { enabled, syncDays, syncHour }
+      const { enabled, syncDays, syncHour, treatSoftMatchAsUnmonitored } =
+        settings
+      const data = { enabled, syncDays, syncHour, treatSoftMatchAsUnmonitored }
 
       const record = await this.update<GeneralSettings>({
         select: this.generalSettingsSelect,
