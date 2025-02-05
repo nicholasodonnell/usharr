@@ -13,6 +13,10 @@ export default function CreateRule(): JSX.Element {
   const { data: tags, isLoading: tagsLoading } = useQuery('tags', getTags)
   const navigate = useNavigate()
 
+  const handleCancel = () => {
+    navigate('/rules')
+  }
+
   const handleCreate = async (rule: RuleModel) => {
     await create(rule)
     toast.success('Rule created')
@@ -25,6 +29,7 @@ export default function CreateRule(): JSX.Element {
       <Rule
         availableTags={tags}
         loading={tagsLoading}
+        onCancel={handleCancel}
         onSubmit={handleCreate}
       />
     </Section>

@@ -30,6 +30,10 @@ export default function EditRule(): JSX.Element {
     },
   })
 
+  const handleCancel = () => {
+    navigate('/rules')
+  }
+
   const handleEdit = async (rule: RuleModel) => {
     await update(rule)
     toast.success('Rule saved')
@@ -48,6 +52,7 @@ export default function EditRule(): JSX.Element {
       <Rule
         availableTags={tags}
         loading={loading || tagsLoading}
+        onCancel={handleCancel}
         onDelete={handleDelete}
         onSubmit={handleEdit}
         values={rule}

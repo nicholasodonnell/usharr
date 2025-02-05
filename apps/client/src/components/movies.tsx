@@ -53,7 +53,7 @@ export function Movie({
         )}
         {movie.daysUntilDeletion !== null &&
           movie.daysUntilDeletion !== undefined && (
-            <span className="font-small absolute left-2 top-2 z-30 rounded-lg border-[1px] border-app-background-accent bg-red p-1 text-sm uppercase text-white shadow-lg">
+            <span className="font-small absolute left-2 top-2 z-30 rounded-lg border-[1px] border-app-background-accent bg-red p-1 text-sm uppercase text-white opacity-90 shadow-lg">
               {movie.daysUntilDeletion > 0 ? (
                 <>
                   {movie.daysUntilDeletion} day
@@ -95,7 +95,7 @@ export default function Movies({
   loading = false,
 }: MoviesProps): JSX.Element {
   return (
-    <div className="grid grid-cols-4 gap-4 md:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-10">
+    <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-10">
       {loading && <MoviesSkeleton />}
       {!loading && children}
     </div>

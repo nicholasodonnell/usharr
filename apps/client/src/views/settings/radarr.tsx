@@ -97,11 +97,11 @@ export default function Radarr(): JSX.Element {
           </Alert>
         )}
         <Field>
-          <Label className="col-span-1" required>
+          <Label className="col-span-2 md:col-span-1" required>
             Url
           </Label>
           <Input
-            className="col-span-3"
+            className="col-span-2 md:col-span-3"
             disabled={settingsLoading || pingLoading}
             onChange={setProperty('radarrUrl')}
             placeholder="http://localhost:7878"
@@ -110,11 +110,11 @@ export default function Radarr(): JSX.Element {
           />
         </Field>
         <Field>
-          <Label className="col-span-1" required>
+          <Label className="col-span-2 md:col-span-1" required>
             API Key
           </Label>
           <Input
-            className="col-span-3"
+            className="col-span-2 md:col-span-3"
             disabled={settingsLoading || pingLoading}
             onChange={setProperty('radarrApiKey')}
             required
@@ -123,11 +123,11 @@ export default function Radarr(): JSX.Element {
           />
         </Field>
         <Field>
-          <Label className="col-span-1">
+          <Label className="col-span-2 md:col-span-1">
             Exclude deleted movies from Radarr lists?
           </Label>
           <Checkbox
-            className="col-span-3"
+            className="col-span-2 md:col-span-3"
             disabled={settingsLoading || pingLoading}
             onChange={setProperty('radarrAddImportListExclusion')}
             value={settings?.radarrAddImportListExclusion}
