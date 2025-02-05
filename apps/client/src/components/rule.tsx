@@ -17,6 +17,7 @@ import {
 export type RuleProps = {
   availableTags: Tag[]
   loading?: boolean
+  onCancel?: () => void
   onDelete?: (rule: RuleModel) => Promise<void>
   onSubmit: (rule: RuleModel) => Promise<void>
   values?: RuleModel
@@ -30,6 +31,7 @@ const defaultRule: Partial<RuleModel> = {
 
 export function RuleForm({
   availableTags = [],
+  onCancel,
   onDelete,
   onSubmit,
   values,
@@ -43,6 +45,10 @@ export function RuleForm({
       ...rule,
       [property]: value,
     })
+  }
+
+  const handleCancel = async () => {
+    onCancel?.()
   }
 
   const handleSubmit = async () => {
@@ -178,6 +184,11 @@ export function RuleForm({
         />
       </Field>
       <Actions>
+        {onCancel && (
+          <Button onClick={handleCancel} secondary>
+            Cancel
+          </Button>
+        )}
         {onDelete && (
           <Button onClick={handleDelete} warning>
             Delete
@@ -192,6 +203,7 @@ export function RuleForm({
 export default function Rule({
   availableTags = [],
   loading,
+  onCancel,
   onDelete,
   onSubmit,
   values,
@@ -203,6 +215,7 @@ export default function Rule({
   return (
     <RuleForm
       availableTags={availableTags}
+      onCancel={onCancel}
       onDelete={onDelete}
       onSubmit={onSubmit}
       values={values}

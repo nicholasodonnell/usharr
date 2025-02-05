@@ -47,18 +47,20 @@ export default function General(): JSX.Element {
       <Title>Settings &#8212; General</Title>
       <Form disabled={isLoading} onSubmit={handleSubmit}>
         <Field>
-          <Label className="col-span-1">Enabled</Label>
+          <Label className="col-span-2 md:col-span-1">Enabled</Label>
           <Checkbox
-            className="col-span-3"
+            className="col-span-2 md:col-span-3"
             disabled={isLoading}
             onChange={setProperty('enabled')}
             value={settings?.enabled}
           />
         </Field>
         <Field>
-          <Label className="col-span-1">Sync frequency (Days)</Label>
+          <Label className="col-span-2 md:col-span-1">
+            Sync frequency (Days)
+          </Label>
           <NumberInput
-            className="col-span-3"
+            className="col-span-2 md:col-span-3"
             disabled={isLoading}
             max={365}
             min={1}
@@ -68,9 +70,9 @@ export default function General(): JSX.Element {
           />
         </Field>
         <Field>
-          <Label className="col-span-1">Sync Time</Label>
+          <Label className="col-span-2 md:col-span-1">Sync Time</Label>
           <Select<number>
-            className="col-span-3"
+            className="col-span-2 md:col-span-3"
             disabled={isLoading}
             onChange={setProperty('syncHour')}
             options={[
@@ -104,16 +106,16 @@ export default function General(): JSX.Element {
           />
         </Field>
         <Field>
-          <Label className="col-span-1">
-            Treat soft matches as unmonitored
+          <Label className="col-span-2 md:col-span-1">
+            Treat soft matches as unmonitored?
             <Hint className="mt-2">
               Soft matches are movies that match a rule but cannot be given a
               deletion date because of dynamic conditions such as watch status,
-              rating, etc.?
+              rating, etc.
             </Hint>
           </Label>
           <Checkbox
-            className="col-span-3"
+            className="col-span-2 md:col-span-3"
             disabled={isLoading}
             onChange={setProperty('treatSoftMatchAsUnmonitored')}
             value={settings?.treatSoftMatchAsUnmonitored}
