@@ -6,27 +6,27 @@ import { SyncService } from './sync.service'
 export class SyncController {
   constructor(private readonly sync: SyncService) {}
 
-  @Post('full')
   @HttpCode(202)
+  @Post('full')
   async full(): Promise<void> {
     await this.sync.full()
   }
 
-  @Post('partial')
   @HttpCode(202)
+  @Post('partial')
   async partial(): Promise<void> {
     await this.sync.partial()
   }
 
-  @Post('radarr')
   @HttpCode(202)
+  @Post('radarr')
   async radarr(): Promise<void> {
     await this.sync.tags()
     await this.sync.movies()
   }
 
-  @Post('tautulli')
   @HttpCode(202)
+  @Post('tautulli')
   async tautulli(): Promise<void> {
     await this.sync.watchHistory()
   }

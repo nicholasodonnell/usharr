@@ -3,14 +3,11 @@ import { Prisma } from '@prisma/client'
 
 import { PrismaService } from '../prisma.service'
 import { Tag } from '../tag/tag.model'
-
 import { RuleDTO } from './rule.dto'
 import { Rule } from './rule.model'
 
 @Injectable()
 export class RuleService {
-  private readonly logger = new Logger(RuleService.name)
-
   readonly select: Prisma.RuleSelect = {
     appearsInList: true,
     createdAt: true,
@@ -37,119 +34,9 @@ export class RuleService {
     watchedDaysAgo: true,
   }
 
+  private readonly logger = new Logger(RuleService.name)
+
   constructor(private prisma: PrismaService) {}
-
-  private async delete(where: Prisma.RuleWhereUniqueInput) {
-    await this.prisma.rule.delete({
-      where,
-    })
-  }
-
-  private async findMany(
-    params: {
-      orderBy?: Prisma.RuleOrderByWithRelationInput
-      skip?: number
-      take?: number
-      where?: Prisma.RuleWhereInput
-    } = {},
-  ): Promise<Rule[]> {
-    const { orderBy, skip, take, where } = params
-
-    const records = await this.prisma.rule.findMany({
-      orderBy,
-      select: this.select,
-      skip,
-      take,
-      where,
-    })
-
-    return records.map(this.serializeRecord)
-  }
-
-  private async findOne(where: Prisma.RuleWhereUniqueInput): Promise<Rule> {
-    const record = await this.prisma.rule.findUnique({
-      select: this.select,
-      where,
-    })
-
-    return this.serializeRecord(record)
-  }
-
-  private serializeRecord(record): Rule {
-    const {
-      appearsInList,
-      createdAt,
-      downloadedDaysAgo,
-      enabled,
-      id,
-      minimumImdbRating,
-      minimumMetacriticRating,
-      minimumRottenTomatoesRating,
-      minimumTmdbRating,
-      name,
-      tags = [],
-      updatedAt,
-      watched,
-      watchedDaysAgo,
-    } = record
-
-    return new Rule({
-      appearsInList,
-      createdAt,
-      downloadedDaysAgo,
-      enabled,
-      id,
-      minimumImdbRating,
-      minimumMetacriticRating,
-      minimumRottenTomatoesRating,
-      minimumTmdbRating,
-      name,
-      tags: tags.map((tag) => new Tag(tag.tag)),
-      updatedAt,
-      watched,
-      watchedDaysAgo,
-    })
-  }
-
-  private async updateMany(params: {
-    data: Prisma.RuleUpdateManyMutationInput
-    where?: Prisma.RuleWhereInput
-  }): Promise<void> {
-    const { data, where } = params
-
-    await this.prisma.rule.updateMany({
-      data,
-      where,
-    })
-  }
-
-  private async upsert(params: {
-    create: Prisma.RuleCreateInput
-    update: Prisma.RuleUpdateInput
-    where: Prisma.RuleWhereUniqueInput
-  }): Promise<Rule> {
-    const { create, update, where } = params
-
-    return await this.prisma.$transaction(async (trx) => {
-      // delete all tags that are not in the new list
-      if (create.tags || update.tags) {
-        await trx.ruleTag.deleteMany({
-          where: {
-            ruleId: where.id,
-          },
-        })
-      }
-
-      const record = await trx.rule.upsert({
-        create,
-        select: this.select,
-        update,
-        where,
-      })
-
-      return this.serializeRecord(record)
-    })
-  }
 
   async create(rule: RuleDTO): Promise<Rule> {
     try {
@@ -349,5 +236,117 @@ export class RuleService {
 
       throw error
     }
+  }
+
+  private async delete(where: Prisma.RuleWhereUniqueInput) {
+    await this.prisma.rule.delete({
+      where,
+    })
+  }
+
+  private async findMany(
+    params: {
+      orderBy?: Prisma.RuleOrderByWithRelationInput
+      skip?: number
+      take?: number
+      where?: Prisma.RuleWhereInput
+    } = {},
+  ): Promise<Rule[]> {
+    const { orderBy, skip, take, where } = params
+
+    const records = await this.prisma.rule.findMany({
+      orderBy,
+      select: this.select,
+      skip,
+      take,
+      where,
+    })
+
+    return records.map(this.serializeRecord)
+  }
+
+  private async findOne(where: Prisma.RuleWhereUniqueInput): Promise<Rule> {
+    const record = await this.prisma.rule.findUnique({
+      select: this.select,
+      where,
+    })
+
+    return this.serializeRecord(record)
+  }
+
+  private serializeRecord(record): Rule {
+    const {
+      appearsInList,
+      createdAt,
+      downloadedDaysAgo,
+      enabled,
+      id,
+      minimumImdbRating,
+      minimumMetacriticRating,
+      minimumRottenTomatoesRating,
+      minimumTmdbRating,
+      name,
+      tags = [],
+      updatedAt,
+      watched,
+      watchedDaysAgo,
+    } = record
+
+    return new Rule({
+      appearsInList,
+      createdAt,
+      downloadedDaysAgo,
+      enabled,
+      id,
+      minimumImdbRating,
+      minimumMetacriticRating,
+      minimumRottenTomatoesRating,
+      minimumTmdbRating,
+      name,
+      tags: tags.map((tag) => new Tag(tag.tag)),
+      updatedAt,
+      watched,
+      watchedDaysAgo,
+    })
+  }
+
+  private async updateMany(params: {
+    data: Prisma.RuleUpdateManyMutationInput
+    where?: Prisma.RuleWhereInput
+  }): Promise<void> {
+    const { data, where } = params
+
+    await this.prisma.rule.updateMany({
+      data,
+      where,
+    })
+  }
+
+  private async upsert(params: {
+    create: Prisma.RuleCreateInput
+    update: Prisma.RuleUpdateInput
+    where: Prisma.RuleWhereUniqueInput
+  }): Promise<Rule> {
+    const { create, update, where } = params
+
+    return await this.prisma.$transaction(async (trx) => {
+      // delete all tags that are not in the new list
+      if (create.tags || update.tags) {
+        await trx.ruleTag.deleteMany({
+          where: {
+            ruleId: where.id,
+          },
+        })
+      }
+
+      const record = await trx.rule.upsert({
+        create,
+        select: this.select,
+        update,
+        where,
+      })
+
+      return this.serializeRecord(record)
+    })
   }
 }

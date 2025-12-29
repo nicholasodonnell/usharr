@@ -13,60 +13,15 @@ export type NavProps = {
 
 export type TopNavProps = NavProps & {
   children?: React.ReactNode
-  icon: JSX.Element
+  icon: React.ReactElement<{ className?: string }>
 }
 
-export function TopNav({
-  children,
-  icon,
-  title,
-  to,
-}: TopNavProps): JSX.Element {
-  return (
-    <li className="-mx-2">
-      <NavLink
-        className={({ isActive }) =>
-          cx(
-            'flex items-center rounded-lg px-2 py-3 text-xl transition-colors hover:bg-app-background-light',
-            {
-              'bg-gradient-to-r from-purple to-pink': !children && isActive,
-            },
-          )
-        }
-        to={to}>
-        {React.cloneElement(icon, { className: 'mr-4 h-6 w-6' })} {title}
-      </NavLink>
-      {children && (
-        <ul className="grid w-full grid-cols-1 gap-2 pl-4 pt-4">{children}</ul>
-      )}
-    </li>
-  )
-}
-
-export function SubNav({ title, to }: NavProps): JSX.Element {
-  return (
-    <li className="w-full">
-      <NavLink
-        className={({ isActive }) =>
-          cx(
-            'text-md flex items-center rounded-lg px-4 py-3 transition-colors hover:bg-app-background-light',
-            {
-              'bg-gradient-to-r from-purple to-pink': isActive,
-            },
-          )
-        }
-        to={to}>
-        {title}
-      </NavLink>
-    </li>
-  )
-}
-
-export default function Nav(): JSX.Element {
+export default function Nav(): React.ReactNode {
   const { pathname } = useLocation()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMobileNavOpen(false)
   }, [pathname])
 
@@ -85,7 +40,7 @@ export default function Nav(): JSX.Element {
       </div>
       <nav
         className={cx(
-          'fixed left-0 z-20 mt-20 flex w-full flex-col overflow-hidden border-r-[1px] border-r-app-background-accent bg-app-background md:mt-0 md:w-64',
+          'fixed left-0 z-20 mt-20 flex w-full flex-col overflow-hidden border-r border-r-app-background-accent bg-app-background md:mt-0 md:w-64',
           {
             'h-0 md:h-screen': !mobileNavOpen,
             'h-screen': mobileNavOpen,
@@ -112,5 +67,54 @@ export default function Nav(): JSX.Element {
         </div>
       </nav>
     </>
+  )
+}
+
+export function SubNav({ title, to }: NavProps): React.ReactNode {
+  return (
+    <li className="w-full">
+      <NavLink
+        className={({ isActive }) =>
+          cx(
+            'text-md flex items-center rounded-lg px-4 py-3 transition-colors hover:bg-app-background-light',
+            {
+              'bg-linear-to-r from-purple to-pink': isActive,
+            },
+          )
+        }
+        to={to}>
+        {title}
+      </NavLink>
+    </li>
+  )
+}
+
+export function TopNav({
+  children,
+  icon,
+  title,
+  to,
+}: TopNavProps): React.ReactNode {
+  return (
+    <li className="-mx-2">
+      <NavLink
+        className={({ isActive }) =>
+          cx(
+            'flex items-center rounded-lg px-2 py-3 text-xl transition-colors hover:bg-app-background-light',
+            {
+              'bg-linear-to-r from-purple to-pink': !children && isActive,
+            },
+          )
+        }
+        to={to}>
+        {React.cloneElement(icon, {
+          className: 'mr-4 h-6 w-6',
+        })}{' '}
+        {title}
+      </NavLink>
+      {children && (
+        <ul className="grid w-full grid-cols-1 gap-2 pt-4 pl-4">{children}</ul>
+      )}
+    </li>
   )
 }

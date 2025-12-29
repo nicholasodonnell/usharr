@@ -1,5 +1,6 @@
-import { OmitType } from '@nestjs/swagger'
 import type { TagDTO as ITagDTO } from '@usharr/types'
+
+import { OmitType } from '@nestjs/swagger'
 
 import { Tag } from './tag.model'
 

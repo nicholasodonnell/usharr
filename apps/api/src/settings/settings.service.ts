@@ -2,7 +2,6 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 
 import { PrismaService } from '../prisma.service'
-
 import {
   GeneralSettingsDTO,
   RadarrSettingsDTO,
@@ -16,8 +15,6 @@ import {
 
 @Injectable()
 export class SettingsService implements OnModuleInit {
-  private readonly id = 1
-  private readonly logger = new Logger(SettingsService.name)
   readonly generalSettingsSelect: Prisma.SettingsSelect = {
     enabled: true,
     syncDays: true,
@@ -33,37 +30,10 @@ export class SettingsService implements OnModuleInit {
     tautulliApiKey: true,
     tautulliUrl: true,
   }
+  private readonly id = 1
+  private readonly logger = new Logger(SettingsService.name)
 
   constructor(private prisma: PrismaService) {}
-
-  private async findFirst<T>(select: Prisma.SettingsSelect): Promise<T> {
-    return this.prisma.settings.findFirst({
-      select,
-      where: { id: this.id },
-    }) as T
-  }
-
-  private serializeTautulliRecord(record): TautulliSettings {
-    const { tautulliApiKey, tautulliUrl } = record
-
-    return new TautulliSettings({
-      tautulliApiKey,
-      tautulliUrl,
-    })
-  }
-
-  private async update<T>(params: {
-    select: Prisma.SettingsSelect
-    update: Prisma.SettingsUpdateInput
-  }): Promise<T> {
-    const { select, update } = params
-
-    return this.prisma.settings.update({
-      data: update,
-      select,
-      where: { id: this.id },
-    }) as T
-  }
 
   /**
    * Get general settings
@@ -199,5 +169,34 @@ export class SettingsService implements OnModuleInit {
 
       throw error
     }
+  }
+
+  private async findFirst<T>(select: Prisma.SettingsSelect): Promise<T> {
+    return this.prisma.settings.findFirst({
+      select,
+      where: { id: this.id },
+    }) as T
+  }
+
+  private serializeTautulliRecord(record): TautulliSettings {
+    const { tautulliApiKey, tautulliUrl } = record
+
+    return new TautulliSettings({
+      tautulliApiKey,
+      tautulliUrl,
+    })
+  }
+
+  private async update<T>(params: {
+    select: Prisma.SettingsSelect
+    update: Prisma.SettingsUpdateInput
+  }): Promise<T> {
+    const { select, update } = params
+
+    return this.prisma.settings.update({
+      data: update,
+      select,
+      where: { id: this.id },
+    }) as T
   }
 }

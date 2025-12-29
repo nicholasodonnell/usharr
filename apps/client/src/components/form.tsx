@@ -1,75 +1,9 @@
 import cx from 'classnames'
 import React from 'react'
 
-export type FormProps = {
-  children: React.ReactNode
-  className?: string
-  disabled?: boolean
-  onSubmit?: () => Promise<void>
-}
-
-export type FieldProps = {
-  children: React.ReactNode
-  className?: string
-}
-
 export type ActionsProps = {
   children: React.ReactNode
   className?: string
-}
-
-export type GenericInputProps = {
-  className?: string
-  disabled?: boolean
-  maxLength?: number
-  placeholder?: string
-  required?: boolean
-}
-
-export type InputProps = GenericInputProps & {
-  onChange: (value: string) => void
-  type?: 'password' | 'text'
-  value: null | string
-}
-
-export type NumberInputProps = GenericInputProps & {
-  max?: number
-  min?: number
-  onChange: (value: number) => void
-  value: null | number
-}
-
-export type LabelPros = {
-  children: React.ReactNode
-  className?: string
-  required?: boolean
-}
-
-export type HintProps = {
-  children: React.ReactNode
-  className?: string
-}
-
-export type SelectOption<T> = {
-  label: string
-  value: T
-}
-
-export type GenericSelectProps<T> = {
-  className?: string
-  disabled?: boolean
-  options: SelectOption<T>[]
-  required?: boolean
-}
-
-export type SelectProps<T> = GenericSelectProps<T> & {
-  onChange: (value: T) => void
-  value: T
-}
-
-export type MultipleSelectProps<T> = GenericSelectProps<T> & {
-  onChange: (values: T[]) => void
-  values: T[]
 }
 
 export type CheckboxProps = {
@@ -80,12 +14,128 @@ export type CheckboxProps = {
   value: boolean
 }
 
+export type FieldProps = {
+  children: React.ReactNode
+  className?: string
+}
+
+export type FormProps = {
+  children: React.ReactNode
+  className?: string
+  disabled?: boolean
+  onSubmit?: () => Promise<void>
+}
+
+export type GenericInputProps = {
+  className?: string
+  disabled?: boolean
+  maxLength?: number
+  placeholder?: string
+  required?: boolean
+}
+
+export type GenericSelectProps<T> = {
+  className?: string
+  disabled?: boolean
+  options: SelectOption<T>[]
+  required?: boolean
+}
+
+export type HintProps = {
+  children: React.ReactNode
+  className?: string
+}
+
+export type InputProps = GenericInputProps & {
+  onChange: (value: string) => void
+  type?: 'password' | 'text'
+  value: null | string
+}
+
+export type LabelPros = {
+  children: React.ReactNode
+  className?: string
+  required?: boolean
+}
+
+export type MultipleSelectProps<T> = GenericSelectProps<T> & {
+  onChange: (values: T[]) => void
+  values: T[]
+}
+
+export type NumberInputProps = GenericInputProps & {
+  max?: number
+  min?: number
+  onChange: (value: number) => void
+  value: null | number
+}
+
+export type SelectOption<T> = {
+  label: string
+  value: T
+}
+
+export type SelectProps<T> = GenericSelectProps<T> & {
+  onChange: (value: T) => void
+  value: T
+}
+
+export function Actions({
+  children,
+  className,
+}: ActionsProps): React.ReactNode {
+  return (
+    <div className={cx('mt-5 flex w-full justify-end gap-4', className)}>
+      {children}
+    </div>
+  )
+}
+
+export function Checkbox({
+  className,
+  disabled = false,
+  onChange,
+  required = false,
+  value = false,
+}: CheckboxProps): React.ReactNode {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    onChange(event.target.checked)
+  }
+
+  return (
+    <input
+      autoComplete="off"
+      checked={value}
+      className={cx(
+        'h-6 w-6 rounded-md border border-app-background-accent accent-pink transition-colors focus:border-pink focus:outline-none',
+        {
+          'pointer-events-none opacity-50': disabled,
+        },
+        className,
+      )}
+      disabled={disabled}
+      onChange={handleChange}
+      required={required}
+      type="checkbox"
+    />
+  )
+}
+
+export function Field({ children, className }: FieldProps): React.ReactNode {
+  return (
+    <div
+      className={cx('grid w-full grid-cols-4 gap-2 align-middle', className)}>
+      {children}
+    </div>
+  )
+}
+
 export function Form({
   children,
   className,
   disabled = false,
   onSubmit,
-}: FormProps): JSX.Element {
+}: FormProps): React.ReactNode {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
     onSubmit?.()
@@ -107,41 +157,9 @@ export function Form({
   )
 }
 
-export function Field({ children, className }: FieldProps): JSX.Element {
+export function Hint({ children, className }: HintProps): React.ReactNode {
   return (
-    <div
-      className={cx('grid w-full grid-cols-4 gap-2 align-middle', className)}>
-      {children}
-    </div>
-  )
-}
-
-export function Actions({ children, className }: ActionsProps): JSX.Element {
-  return (
-    <div className={cx('mt-5 flex w-full justify-end gap-4', className)}>
-      {children}
-    </div>
-  )
-}
-
-export function Label({
-  children,
-  className,
-  required = false,
-}: LabelPros): JSX.Element {
-  return (
-    <label className={cx('text-md flex items-center', className)}>
-      <span>
-        {children}
-        {required && <sup className="ml-1 text-red ">*</sup>}
-      </span>
-    </label>
-  )
-}
-
-export function Hint({ children, className }: HintProps): JSX.Element {
-  return (
-    <div className={cx('text-xs italic text-gray', className)}>{children}</div>
+    <div className={cx('text-xs text-gray italic', className)}>{children}</div>
   )
 }
 
@@ -154,7 +172,7 @@ export function Input({
   required = false,
   type = 'text',
   value,
-}: InputProps): JSX.Element {
+}: InputProps): React.ReactNode {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     onChange(event.target.value || null)
   }
@@ -163,7 +181,7 @@ export function Input({
     <input
       autoComplete="off"
       className={cx(
-        'w-full rounded-md border border-app-background-accent bg-app-background px-4 py-2 text-xl transition-colors focus:border-pink focus:outline-none ',
+        'w-full rounded-md border border-app-background-accent bg-app-background px-4 py-2 text-xl transition-colors focus:border-pink focus:outline-none',
         {
           'pointer-events-none opacity-50': disabled,
         },
@@ -179,6 +197,63 @@ export function Input({
   )
 }
 
+export function Label({
+  children,
+  className,
+  required = false,
+}: LabelPros): React.ReactNode {
+  return (
+    <label className={cx('text-md flex items-center', className)}>
+      <span>
+        {children}
+        {required && <sup className="ml-1 text-red">*</sup>}
+      </span>
+    </label>
+  )
+}
+
+export function MultipleSelect<T>({
+  className,
+  disabled = false,
+  onChange,
+  options = [],
+  required = false,
+  values = [],
+}: MultipleSelectProps<T>): React.ReactNode {
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>): void => {
+    onChange(
+      Array.from(event.target.selectedOptions).map(
+        (option: HTMLOptionElement) => options[option.index].value,
+      ),
+    )
+  }
+
+  return (
+    <select
+      autoComplete="off"
+      className={cx(
+        'h-72 w-full rounded-md border border-app-background-accent bg-app-background px-4 py-2 text-xl transition-colors focus:border-pink focus:outline-none',
+        {
+          'pointer-events-none opacity-50': disabled,
+        },
+        className,
+      )}
+      disabled={disabled}
+      multiple
+      onChange={handleChange}
+      required={required}>
+      {options.map((option: SelectOption<T>) => (
+        <option
+          disabled={disabled}
+          key={option.label}
+          selected={values?.includes(option.value)}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  )
+}
+
 export function NumberInput({
   className,
   disabled = false,
@@ -189,7 +264,7 @@ export function NumberInput({
   placeholder = '',
   required = false,
   value,
-}: NumberInputProps): JSX.Element {
+}: NumberInputProps): React.ReactNode {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     onChange(parseInt(event.target.value))
   }
@@ -198,7 +273,7 @@ export function NumberInput({
     <input
       autoComplete="off"
       className={cx(
-        'h-12 w-full rounded-md border border-app-background-accent bg-app-background px-4 py-2 text-xl transition-colors focus:border-pink focus:outline-none ',
+        'h-12 w-full rounded-md border border-app-background-accent bg-app-background px-4 py-2 text-xl transition-colors focus:border-pink focus:outline-none',
         {
           'pointer-events-none opacity-50': disabled,
         },
@@ -224,7 +299,7 @@ export function Select<T>({
   options = [],
   required = false,
   value,
-}: SelectProps<T>): JSX.Element {
+}: SelectProps<T>): React.ReactNode {
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>): void => {
     onChange(options[event.target.selectedOptions[0].index].value)
   }
@@ -233,7 +308,7 @@ export function Select<T>({
     <select
       autoComplete="off"
       className={cx(
-        'h-12 w-full rounded-md border border-app-background-accent bg-app-background px-4 py-2 text-xl transition-colors focus:border-pink focus:outline-none ',
+        'h-12 w-full rounded-md border border-app-background-accent bg-app-background px-4 py-2 text-xl transition-colors focus:border-pink focus:outline-none',
         {
           'pointer-events-none opacity-50': disabled,
         },
@@ -251,77 +326,5 @@ export function Select<T>({
         </option>
       ))}
     </select>
-  )
-}
-
-export function MultipleSelect<T>({
-  className,
-  disabled = false,
-  onChange,
-  options = [],
-  required = false,
-  values = [],
-}: MultipleSelectProps<T>): JSX.Element {
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>): void => {
-    onChange(
-      Array.from(event.target.selectedOptions).map(
-        (option: HTMLOptionElement) => options[option.index].value,
-      ),
-    )
-  }
-
-  return (
-    <select
-      autoComplete="off"
-      className={cx(
-        'h-72 w-full rounded-md border border-app-background-accent bg-app-background px-4 py-2 text-xl transition-colors focus:border-pink focus:outline-none ',
-        {
-          'pointer-events-none opacity-50': disabled,
-        },
-        className,
-      )}
-      disabled={disabled}
-      multiple
-      onChange={handleChange}
-      required={required}>
-      {options.map((option: SelectOption<T>) => (
-        <option
-          disabled={disabled}
-          key={option.label}
-          selected={values?.includes(option.value)}>
-          {option.label}
-        </option>
-      ))}
-    </select>
-  )
-}
-
-export function Checkbox({
-  className,
-  disabled = false,
-  onChange,
-  required = false,
-  value = false,
-}: CheckboxProps): JSX.Element {
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    onChange(event.target.checked)
-  }
-
-  return (
-    <input
-      autoComplete="off"
-      checked={value}
-      className={cx(
-        'h-6 w-6 rounded-md border border-app-background-accent accent-pink transition-colors focus:border-pink focus:outline-none',
-        {
-          'pointer-events-none opacity-50': disabled,
-        },
-        className,
-      )}
-      disabled={disabled}
-      onChange={handleChange}
-      required={required}
-      type="checkbox"
-    />
   )
 }

@@ -8,22 +8,23 @@
     "forceConsistentCasingInFileNames": false,
     "incremental": true,
     "isolatedModules": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noFallthroughCasesInSwitch": false,
     "noImplicitAny": false,
+    "paths": {
+      "@app/*": ["./src/*"]
+    },
     "removeComments": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strictBindCallApply": false,
     "strictNullChecks": false,
-    "target": "es2015"
-  },
-  "paths": {
-    "@app/*": ["src/*"],
+    "target": "es2015",
+    "types": ["react", "react-dom"]
   },
   "include": ["**/*.ts", "**/*.tsx", "custom.d.ts"],
   "exclude": ["node_modules", "dist"]

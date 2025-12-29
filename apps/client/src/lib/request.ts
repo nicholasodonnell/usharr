@@ -1,5 +1,6 @@
-import axios from 'axios'
 import type { AxiosInstance, AxiosResponse, Method } from 'axios'
+
+import axios from 'axios'
 import { toast } from 'react-toastify'
 
 export type Request<Data> = {

@@ -1,15 +1,6 @@
 import React from 'react'
 
 export default class ErrorBoundary extends React.Component {
-  onUnhandledRejection = (e) => {
-    e.promise.catch(() => {
-      console.log('unhandledrejection', e)
-    })
-
-    e.stopImmediatePropagation()
-    e.preventDefault()
-  }
-
   props: {
     children: React.ReactNode
   }
@@ -28,6 +19,15 @@ export default class ErrorBoundary extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener('unhandledrejection', this.onUnhandledRejection)
+  }
+
+  onUnhandledRejection = (e) => {
+    e.promise.catch(() => {
+      console.log('unhandledrejection', e)
+    })
+
+    e.stopImmediatePropagation()
+    e.preventDefault()
   }
 
   render() {

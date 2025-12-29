@@ -1,9 +1,8 @@
 import React from 'react'
 import { ToastContainer } from 'react-toastify'
-
 import 'react-toastify/dist/ReactToastify.css'
 
-export default function Toasts() {
+export default function Toasts(): React.ReactNode {
   return (
     <ToastContainer
       autoClose={3000}

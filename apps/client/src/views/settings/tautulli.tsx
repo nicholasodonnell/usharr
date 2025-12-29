@@ -1,5 +1,5 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import React from 'react'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { toast } from 'react-toastify'
 
 import Alert from '../../components/alert'
@@ -15,28 +15,33 @@ import {
   updateTautulliSettings,
 } from '../../lib/api'
 
-export default function Tautulli(): JSX.Element {
+export default function Tautulli(): React.ReactNode {
   const queryClient = useQueryClient()
 
-  const { data: settingsData, isLoading: settingsLoading } = useQuery(
-    'settings/tautulli',
-    getTautulliSettings,
-  )
+  const { data: settingsData, isLoading: settingsLoading } = useQuery({
+    queryFn: getTautulliSettings,
+    queryKey: ['settings', 'tautulli'],
+  })
 
-  const { data: pingData, isLoading: pingLoading } = useQuery(
-    'tautulli/ping',
-    pingTautulli,
-  )
+  const { data: pingData, isLoading: pingLoading } = useQuery({
+    queryFn: pingTautulli,
+    queryKey: ['tautulli', 'ping'],
+  })
 
-  const { mutateAsync: postPing } = useMutation(postPingTautulli)
+  const { mutateAsync: postPing } = useMutation({
+    mutationFn: postPingTautulli,
+  })
 
-  const { mutateAsync: update } = useMutation(updateTautulliSettings, {
+  const { mutateAsync: update } = useMutation({
+    mutationFn: updateTautulliSettings,
     onSettled: () => {
-      queryClient.invalidateQueries('settings/tautulli')
+      queryClient.invalidateQueries({ queryKey: ['settings', 'tautulli'] })
     },
   })
 
-  const { mutateAsync: tautulliSync } = useMutation(syncTautulli)
+  const { mutateAsync: tautulliSync } = useMutation({
+    mutationFn: syncTautulli,
+  })
 
   const [settings, setSettings] = useAsyncState(settingsData)
   const [ping, setPing] = useAsyncState(pingData)

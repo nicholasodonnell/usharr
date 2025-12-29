@@ -1,6 +1,26 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --font-mono: 'Fira Code', monospace;
+
+  --color-app-background: #15171b;
+  --color-app-background-accent: rgba(255, 255, 255, 0.15);
+  --color-app-background-light: #1d1e26;
+  --color-black: #000;
+  --color-black-secondary: #21222c;
+  --color-cyan: #80ffea;
+  --color-gray: #999;
+  --color-green: #8aff80;
+  --color-orange: #ffb86c;
+  --color-pink: #ff80bf;
+  --color-pink-secondary: #ff5aac;
+  --color-purple: #9580ff;
+  --color-purple-secondary: #755aff;
+  --color-red: #ff5555;
+  --color-white: #fff;
+  --color-white-secondary: #f8f8f2;
+  --color-yellow: #f1fa8c;
+}
 
 :root {
   --app-background: #15171b;
@@ -11,8 +31,8 @@
 body {
   background-color: var(--app-background-light);
   --toastify-color-info: var(--app-background-light);
-  --toastify-color-success: theme('colors.purple');;
-  --toastify-color-error: theme('colors.red');
+  --toastify-color-success: var(--color-purple);
+  --toastify-color-error: var(--color-red);
 }
 
 

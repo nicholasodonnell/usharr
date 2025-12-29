@@ -25,7 +25,7 @@ export default function MovieModal({
   onClose,
   open,
   title,
-}: MovieModalProps): JSX.Element {
+}: MovieModalProps): React.ReactNode {
   const handleAction = async () => {
     await onAction?.(movie)
   }

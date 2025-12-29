@@ -1,8 +1,7 @@
-import { join } from 'path'
-
 import { Module } from '@nestjs/common'
 import { ScheduleModule } from '@nestjs/schedule'
 import { ServeStaticModule } from '@nestjs/serve-static'
+import { join } from 'path'
 
 import { MovieModule } from './movie/movie.module'
 import { RadarrModule } from './radarr/radarr.module'

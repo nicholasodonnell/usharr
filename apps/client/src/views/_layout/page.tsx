@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom'
 import Main from './main'
 import Nav from './nav'
 
-export default function Page(): JSX.Element {
+export default function Page(): React.ReactNode {
   return (
     <div className="bg-app-background-flex relative flex h-screen w-screen flex-row overflow-hidden font-mono text-white">
       <Nav />

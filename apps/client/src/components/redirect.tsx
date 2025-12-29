@@ -5,7 +5,7 @@ export type RedirectProps = {
   to: string
 }
 
-export default function Redirect({ to }: RedirectProps): JSX.Element {
+export default function Redirect({ to }: RedirectProps): React.ReactNode {
   const navigate = useNavigate()
 
   useEffect(() => {

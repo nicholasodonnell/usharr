@@ -1,5 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger'
 import type { RadarrPing as IRadarrPing } from '@usharr/types'
+
+import { ApiProperty } from '@nestjs/swagger'
 import { IsBoolean } from 'class-validator'
 
 export class RadarrPing implements IRadarrPing {

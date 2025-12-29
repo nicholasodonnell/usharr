@@ -1,14 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common'
 import type {
   TautulliGetHistoryResponse,
   TautulliHistory,
   TautulliSettings,
 } from '@usharr/types'
 import type { AxiosInstance } from 'axios'
+
+import { Injectable, Logger } from '@nestjs/common'
 import axios from 'axios'
 
 import { SettingsService } from '../settings/settings.service'
-
 import { TautulliPing } from './tautulli.model'
 
 @Injectable()
@@ -16,19 +16,6 @@ export class TautulliService {
   private readonly logger = new Logger(TautulliService.name)
 
   constructor(private settings: SettingsService) {}
-
-  private async createClient(
-    tautulliSettings?: TautulliSettings,
-  ): Promise<AxiosInstance> {
-    const { tautulliApiKey, tautulliUrl } =
-      tautulliSettings ?? (await this.settings.getTautulli())
-
-    return axios.create({
-      baseURL: tautulliUrl,
-      params: { apikey: tautulliApiKey },
-      timeout: 10000,
-    })
-  }
 
   async getHistory(
     after: Date,
@@ -99,5 +86,18 @@ export class TautulliService {
 
       return { success: false }
     }
+  }
+
+  private async createClient(
+    tautulliSettings?: TautulliSettings,
+  ): Promise<AxiosInstance> {
+    const { tautulliApiKey, tautulliUrl } =
+      tautulliSettings ?? (await this.settings.getTautulli())
+
+    return axios.create({
+      baseURL: tautulliUrl,
+      params: { apikey: tautulliApiKey },
+      timeout: 10000,
+    })
   }
 }

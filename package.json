@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "build": "npm run build --workspace=@usharr/client --workspace=@usharr/api",
-    "dev": "concurrently \"npm run dev --workspace=@usharr/client\" \"npm run dev --workspace=@usharr/api\"",
+    "dev": "concurrently --names=\"client,api\" \"npm run dev --workspace=@usharr/client\" \"npm run dev --workspace=@usharr/api\"",
     "lint": "npm run lint --workspaces --if-present",
     "db:deploy": "npm run db:deploy --workspace=@usharr/api",
     "db:generate": "npm run db:generate --workspace=@usharr/api",
@@ -18,6 +18,6 @@
     "db:push": "npm run db:push --workspace=@usharr/api"
   },
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "concurrently": "^9.2.1"
   }
 }

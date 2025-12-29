@@ -2,7 +2,6 @@ import { Body, Controller, Get, Post } from '@nestjs/common'
 import { ApiOkResponse } from '@nestjs/swagger'
 
 import { TautulliSettings } from '../settings/settings.model'
-
 import { TautulliPing } from './tautulli.model'
 import { TautulliService } from './tautulli.service'
 
