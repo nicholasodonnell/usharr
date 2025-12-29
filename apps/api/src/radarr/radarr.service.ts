@@ -1,4 +1,3 @@
-import { Injectable, Logger } from '@nestjs/common'
 import type {
   ImportlistMovie,
   RadarrMediaManagement,
@@ -7,10 +6,11 @@ import type {
   RadarrTag,
 } from '@usharr/types'
 import type { AxiosInstance } from 'axios'
+
+import { Injectable, Logger } from '@nestjs/common'
 import axios from 'axios'
 
 import { SettingsService } from '../settings/settings.service'
-
 import { RadarrPing } from './radarr.model'
 
 @Injectable()
@@ -18,19 +18,6 @@ export class RadarrService {
   private readonly logger = new Logger(RadarrService.name)
 
   constructor(private settings: SettingsService) {}
-
-  private async createClient(
-    radarrSettings?: RadarrSettings,
-  ): Promise<AxiosInstance> {
-    const { radarrApiKey, radarrUrl } =
-      radarrSettings ?? (await this.settings.getRadarr())
-
-    return axios.create({
-      baseURL: radarrUrl,
-      headers: { 'X-Api-Key': radarrApiKey },
-      timeout: 10000,
-    })
-  }
 
   /**
    * Delete a movie from Radarr. This action will:
@@ -45,6 +32,15 @@ export class RadarrService {
     try {
       const client = await this.createClient(radarrSettings)
       const settings = radarrSettings ?? (await this.settings.getRadarr())
+
+      // if running in dev mode just log
+      if (process.env.NODE_ENV !== 'production') {
+        this.logger.log(
+          `[DEV MODE] - Simulating deletion of movie with ID ${movieId} from Radarr`,
+        )
+
+        return
+      }
 
       await client.delete(`/api/v3/movie/${movieId}`, {
         params: {
@@ -160,5 +156,18 @@ export class RadarrService {
 
       return { success: false }
     }
+  }
+
+  private async createClient(
+    radarrSettings?: RadarrSettings,
+  ): Promise<AxiosInstance> {
+    const { radarrApiKey, radarrUrl } =
+      radarrSettings ?? (await this.settings.getRadarr())
+
+    return axios.create({
+      baseURL: radarrUrl,
+      headers: { 'X-Api-Key': radarrApiKey },
+      timeout: 10000,
+    })
   }
 }

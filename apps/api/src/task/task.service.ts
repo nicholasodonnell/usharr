@@ -1,6 +1,7 @@
+import type { GeneralSettings, Sync } from '@usharr/types'
+
 import { Injectable, Logger } from '@nestjs/common'
 import { Cron } from '@nestjs/schedule'
-import type { GeneralSettings, Sync } from '@usharr/types'
 
 import { SettingsService } from '../settings/settings.service'
 import { SyncService } from '../sync/sync.service'
@@ -16,39 +17,6 @@ export class TaskService {
     private settings: SettingsService,
     private sync: SyncService,
   ) {}
-
-  private async shouldDoFullSync(): Promise<boolean> {
-    const { enabled, syncDays, syncHour }: GeneralSettings =
-      await this.settings.getGeneral()
-    const lastFullSync: Sync | null = await this.sync.getLast(SyncService.FULL)
-    const now: Date = new Date()
-    const isProduction: boolean = process.env.NODE_ENV === 'production'
-
-    // don't run in development
-    if (!isProduction) {
-      return false
-    }
-
-    // sync setting is not enabled
-    if (!enabled) {
-      return false
-    }
-
-    // sync hour does not match current hour
-    if (syncHour !== now.getHours()) {
-      return false
-    }
-
-    // no last full sync exists
-    if (!lastFullSync) {
-      return true
-    }
-
-    // last full sync finished more than sync days ago
-    return (
-      now.getTime() - lastFullSync.finishedAt.getTime() >= syncDays * ONE_DAY_MS
-    )
-  }
 
   /**
    * Performs either a FULL or PARTIAL sync depending on user settings
@@ -101,5 +69,38 @@ export class TaskService {
 
       throw e
     }
+  }
+
+  private async shouldDoFullSync(): Promise<boolean> {
+    const { enabled, syncDays, syncHour }: GeneralSettings =
+      await this.settings.getGeneral()
+    const lastFullSync: null | Sync = await this.sync.getLast(SyncService.FULL)
+    const now: Date = new Date()
+    const isProduction: boolean = process.env.NODE_ENV === 'production'
+
+    // don't run in development
+    if (!isProduction) {
+      return false
+    }
+
+    // sync setting is not enabled
+    if (!enabled) {
+      return false
+    }
+
+    // sync hour does not match current hour
+    if (syncHour !== now.getHours()) {
+      return false
+    }
+
+    // no last full sync exists
+    if (!lastFullSync) {
+      return true
+    }
+
+    // last full sync finished more than sync days ago
+    return (
+      now.getTime() - lastFullSync.finishedAt.getTime() >= syncDays * ONE_DAY_MS
+    )
   }
 }

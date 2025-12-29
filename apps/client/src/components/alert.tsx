@@ -15,7 +15,7 @@ export default function Alert({
   className,
   error = false,
   warning = false,
-}: AlertProps): JSX.Element {
+}: AlertProps): React.ReactNode {
   return (
     <div
       className={cx(

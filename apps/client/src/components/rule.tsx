@@ -1,4 +1,5 @@
 import type { Rule as RuleModel, Tag } from '@usharr/types'
+
 import React, { useState } from 'react'
 
 import Button from './button'
@@ -14,6 +15,8 @@ import {
   Select,
 } from './form'
 
+export type RuleFormProps = Omit<RuleProps, 'loading' | 'title'>
+
 export type RuleProps = {
   availableTags: Tag[]
   loading?: boolean
@@ -23,10 +26,31 @@ export type RuleProps = {
   values?: RuleModel
 }
 
-export type RuleFormProps = Omit<RuleProps, 'loading' | 'title'>
-
 const defaultRule: Partial<RuleModel> = {
   enabled: false,
+}
+
+export default function Rule({
+  availableTags = [],
+  loading,
+  onCancel,
+  onDelete,
+  onSubmit,
+  values,
+}: RuleProps) {
+  if (loading) {
+    return
+  }
+
+  return (
+    <RuleForm
+      availableTags={availableTags}
+      onCancel={onCancel}
+      onDelete={onDelete}
+      onSubmit={onSubmit}
+      values={values}
+    />
+  )
 }
 
 export function RuleForm({
@@ -35,7 +59,7 @@ export function RuleForm({
   onDelete,
   onSubmit,
   values,
-}: RuleFormProps): JSX.Element {
+}: RuleFormProps): React.ReactNode {
   const [rule, setRule] = useState<RuleModel>(
     values || (defaultRule as RuleModel),
   )
@@ -197,28 +221,5 @@ export function RuleForm({
         <Button type="submit">Save</Button>
       </Actions>
     </Form>
-  )
-}
-
-export default function Rule({
-  availableTags = [],
-  loading,
-  onCancel,
-  onDelete,
-  onSubmit,
-  values,
-}: RuleProps) {
-  if (loading) {
-    return
-  }
-
-  return (
-    <RuleForm
-      availableTags={availableTags}
-      onCancel={onCancel}
-      onDelete={onDelete}
-      onSubmit={onSubmit}
-      values={values}
-    />
   )
 }

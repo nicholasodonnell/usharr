@@ -1,4 +1,5 @@
 import type { Rule as RuleModel } from '@usharr/types'
+
 import cx from 'classnames'
 import React from 'react'
 import { Link } from 'react-router-dom'
@@ -6,16 +7,16 @@ import { Link } from 'react-router-dom'
 import { Plus } from './icon'
 import { H3, H4, P } from './text'
 
+export type RuleProps = {
+  rule: RuleModel
+}
+
 export type RulesProps = {
   children?: React.ReactNode
   loading?: boolean
 }
 
-export type RuleProps = {
-  rule: RuleModel
-}
-
-export function NewRule(): JSX.Element {
+export function NewRule(): React.ReactNode {
   return (
     <div>
       <Link
@@ -30,7 +31,7 @@ export function NewRule(): JSX.Element {
   )
 }
 
-export function Rule({ rule }: RuleProps): JSX.Element {
+export function Rule({ rule }: RuleProps): React.ReactNode {
   return (
     <div>
       <Link
@@ -135,7 +136,19 @@ export function Rule({ rule }: RuleProps): JSX.Element {
   )
 }
 
-export function RulesSkeleton(): JSX.Element {
+export default function Rules({
+  children,
+  loading = false,
+}: RulesProps): React.ReactNode {
+  return (
+    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-3">
+      {loading && <RulesSkeleton />}
+      {!loading && children}
+    </div>
+  )
+}
+
+export function RulesSkeleton(): React.ReactNode {
   return (
     <>
       {Array.from({ length: 3 }).map((_, index) => (
@@ -145,17 +158,5 @@ export function RulesSkeleton(): JSX.Element {
         />
       ))}
     </>
-  )
-}
-
-export default function Rules({
-  children,
-  loading = false,
-}: RulesProps): JSX.Element {
-  return (
-    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-3">
-      {loading && <RulesSkeleton />}
-      {!loading && children}
-    </div>
   )
 }

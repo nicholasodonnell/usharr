@@ -1,7 +1,8 @@
 import type { Movie as MovieModel } from '@usharr/types'
+
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import cx from 'classnames'
 import React, { useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { toast } from 'react-toastify'
 
 import { Input } from '../../components/form'
@@ -10,16 +11,20 @@ import Section, { Title } from '../../components/section'
 import { H4 } from '../../components/text'
 import { getMonitoredMovies, updateMovie } from '../../lib/api'
 
-export default function Monitored(): JSX.Element {
+export default function Monitored(): React.ReactNode {
   const queryClient = useQueryClient()
   const {
     data: movies,
     isLoading,
     refetch,
-  } = useQuery('movies/monitored', getMonitoredMovies)
-  const { mutateAsync } = useMutation(updateMovie, {
+  } = useQuery({
+    queryFn: getMonitoredMovies,
+    queryKey: ['movies', 'monitored'],
+  })
+  const { mutateAsync } = useMutation({
+    mutationFn: updateMovie,
     onSettled: () => {
-      queryClient.invalidateQueries('movies')
+      queryClient.invalidateQueries({ queryKey: ['movies'] })
     },
   })
   const [search, setSearch] = useState<string>('')

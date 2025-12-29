@@ -1,5 +1,5 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import React from 'react'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { toast } from 'react-toastify'
 
 import Button from '../../components/button'
@@ -17,14 +17,18 @@ import Section, { Title } from '../../components/section'
 import useApiState from '../../hooks/useAsyncState'
 import { getSettings, updateSettings } from '../../lib/api'
 
-export default function General(): JSX.Element {
+export default function General(): React.ReactNode {
   const queryClient = useQueryClient()
 
-  const { data, isLoading } = useQuery('settings/general', getSettings)
+  const { data, isLoading } = useQuery({
+    queryFn: getSettings,
+    queryKey: ['settings', 'general'],
+  })
 
-  const { mutateAsync: update } = useMutation(updateSettings, {
+  const { mutateAsync: update } = useMutation({
+    mutationFn: updateSettings,
     onSettled: () => {
-      queryClient.invalidateQueries('settings')
+      queryClient.invalidateQueries({ queryKey: ['settings'] })
     },
   })
 

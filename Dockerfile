@@ -1,7 +1,8 @@
-FROM node:22-bookworm-slim AS base
+FROM node:24-bookworm-slim AS base
 
 # default environment variables
 ENV \
+  DATABASE_URL="file:/config/usharr.db" \
   DEBIAN_FRONTEND=noninteractive \
   TZ=UTC
 
@@ -72,10 +73,18 @@ FROM base AS production
 
 ENV NODE_ENV=production
 
+# node modules
 COPY --from=build --chown=app:app /app/node_modules ./node_modules
-COPY --from=build --chown=app:app /app/apps/api/dist ./dist
+
+# client
 COPY --from=build --chown=app:app /app/apps/client/dist ./public
+
+# api
+COPY --from=build --chown=app:app /app/apps/api/dist/src ./dist
+
+# prisma
 COPY --from=build --chown=app:app /app/apps/api/prisma ./prisma
+COPY --from=build --chown=app:app /app/apps/api/dist/prisma.config.js ./prisma/prisma.config.js
 
 EXPOSE 5588
 

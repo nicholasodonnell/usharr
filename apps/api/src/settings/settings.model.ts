@@ -1,10 +1,11 @@
-import { ApiProperty, PickType } from '@nestjs/swagger'
 import type {
   GeneralSettings as IGeneralSettings,
   RadarrSettings as IRadarrSettings,
   Settings as ISettings,
   TautulliSettings as ITautulliSettings,
 } from '@usharr/types'
+
+import { ApiProperty, PickType } from '@nestjs/swagger'
 import {
   IsBoolean,
   IsDate,
@@ -14,6 +15,7 @@ import {
   IsString,
 } from 'class-validator'
 
+/* eslint-disable perfectionist/sort-modules */
 export class Settings implements ISettings {
   @ApiProperty()
   @IsDate()
@@ -33,13 +35,13 @@ export class Settings implements ISettings {
   radarrAddImportListExclusion: boolean
 
   @ApiProperty()
-  @IsString()
   @IsOptional()
+  @IsString()
   radarrApiKey: null | string
 
   @ApiProperty()
-  @IsString()
   @IsOptional()
+  @IsString()
   radarrUrl: null | string
 
   @ApiProperty()
@@ -51,13 +53,13 @@ export class Settings implements ISettings {
   syncHour: number
 
   @ApiProperty()
-  @IsString()
   @IsOptional()
+  @IsString()
   tautulliApiKey: null | string
 
   @ApiProperty()
-  @IsString()
   @IsOptional()
+  @IsString()
   tautulliUrl: null | string
 
   @ApiProperty()

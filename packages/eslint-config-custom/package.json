@@ -2,12 +2,15 @@
   "name": "@usharr/eslint-config-custom",
   "version": "0.0.0",
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.60.0",
-    "@typescript-eslint/parser": "^5.59.11",
-    "eslint": "^8.44.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-perfectionist": "^2.5.0",
-    "eslint-plugin-prettier": "^5.0.0-alpha.0"
+    "@eslint/compat": "^1.4.1",
+    "@eslint/eslintrc": "^3.3.3",
+    "@eslint/js": "^9.39.2",
+    "@typescript-eslint/eslint-plugin": "^8.50.1",
+    "@typescript-eslint/parser": "^8.50.1",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-perfectionist": "^5.1.0",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^14.0.0"
   }
 }

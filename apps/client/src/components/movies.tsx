@@ -1,13 +1,9 @@
 import type { Movie as MovieModel } from '@usharr/types'
+
 import cx from 'classnames'
 import React, { useState } from 'react'
 
 import MovieModal from './movieModal'
-
-export type MoviesProps = {
-  children?: React.ReactNode
-  loading?: boolean
-}
 
 export type MovieProps = {
   action?: string
@@ -16,12 +12,17 @@ export type MovieProps = {
   onAction?: (movie: MovieModel) => Promise<void>
 }
 
+export type MoviesProps = {
+  children?: React.ReactNode
+  loading?: boolean
+}
+
 export function Movie({
   action,
   className,
   movie,
   onAction,
-}: MovieProps): JSX.Element {
+}: MovieProps): React.ReactNode {
   const [modalOpen, setModalOpen] = useState<boolean>(false)
 
   const handleAction = async (movie: MovieModel) => {
@@ -43,17 +44,17 @@ export function Movie({
           loading="lazy"
           src={movie.poster}
         />
-        <span className="pointer-events-none absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transform text-center text-transparent">
+        <span className="pointer-events-none absolute top-1/2 left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transform text-center text-transparent">
           {movie.title}
         </span>
         {movie.ignored && (
-          <span className="font-small absolute left-2 top-2 z-30 rounded-lg border-[1px] border-app-background-accent bg-app-background p-1 text-sm uppercase text-white shadow-lg">
+          <span className="font-small absolute top-2 left-2 z-30 rounded-lg border border-app-background-accent bg-app-background p-1 text-sm text-white uppercase shadow-lg">
             Ignored
           </span>
         )}
         {movie.daysUntilDeletion !== null &&
           movie.daysUntilDeletion !== undefined && (
-            <span className="font-small absolute left-2 top-2 z-30 rounded-lg border-[1px] border-app-background-accent bg-red p-1 text-sm uppercase text-white opacity-90 shadow-lg">
+            <span className="font-small absolute top-2 left-2 z-30 rounded-lg border border-app-background-accent bg-red p-1 text-sm text-white uppercase opacity-90 shadow-lg">
               {movie.daysUntilDeletion > 0 ? (
                 <>
                   {movie.daysUntilDeletion} day
@@ -77,7 +78,19 @@ export function Movie({
   )
 }
 
-export function MoviesSkeleton(): JSX.Element {
+export default function Movies({
+  children,
+  loading = false,
+}: MoviesProps): React.ReactNode {
+  return (
+    <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-10">
+      {loading && <MoviesSkeleton />}
+      {!loading && children}
+    </div>
+  )
+}
+
+export function MoviesSkeleton(): React.ReactNode {
   return (
     <>
       {Array.from({ length: 100 }).map((_, index) => (
@@ -87,17 +100,5 @@ export function MoviesSkeleton(): JSX.Element {
         />
       ))}
     </>
-  )
-}
-
-export default function Movies({
-  children,
-  loading = false,
-}: MoviesProps): JSX.Element {
-  return (
-    <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-10">
-      {loading && <MoviesSkeleton />}
-      {!loading && children}
-    </div>
   )
 }

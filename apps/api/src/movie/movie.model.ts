@@ -1,5 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger'
 import type { Movie as IMovie } from '@usharr/types'
+
+import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import {
   IsArray,
@@ -31,8 +32,8 @@ export class Movie implements IMovie {
 
   // computed
   @ApiProperty()
-  @IsOptional()
   @IsNumber()
+  @IsOptional()
   daysUntilDeletion: number | undefined
 
   @ApiProperty()
@@ -69,8 +70,8 @@ export class Movie implements IMovie {
 
   // computed
   @ApiProperty()
-  @Type(() => Rule)
   @IsOptional()
+  @Type(() => Rule)
   @ValidateNested({ each: true })
   matchedRule: Rule | undefined
 
@@ -80,8 +81,8 @@ export class Movie implements IMovie {
   metacriticRating: null | number
 
   @ApiProperty()
-  @IsString()
   @IsOptional()
+  @IsString()
   poster: null | string
 
   @ApiProperty()
@@ -91,8 +92,8 @@ export class Movie implements IMovie {
 
   @ApiProperty()
   @IsArray()
-  @ValidateNested({ each: true })
   @Type(() => Tag)
+  @ValidateNested({ each: true })
   tags: Tag[]
 
   @ApiProperty()

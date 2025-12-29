@@ -1,5 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger'
 import type { Rule as IRule } from '@usharr/types'
+
+import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import {
   IsArray,
@@ -24,8 +25,8 @@ export class Rule implements IRule {
   createdAt: Date
 
   @ApiProperty()
-  @IsOptional()
   @IsNumber()
+  @IsOptional()
   downloadedDaysAgo: null | number
 
   @ApiProperty()
@@ -37,23 +38,23 @@ export class Rule implements IRule {
   id: number
 
   @ApiProperty()
-  @IsOptional()
   @IsNumber()
+  @IsOptional()
   minimumImdbRating: null | number
 
   @ApiProperty()
-  @IsOptional()
   @IsNumber()
+  @IsOptional()
   minimumMetacriticRating: null | number
 
   @ApiProperty()
-  @IsOptional()
   @IsNumber()
+  @IsOptional()
   minimumRottenTomatoesRating: null | number
 
   @ApiProperty()
-  @IsOptional()
   @IsNumber()
+  @IsOptional()
   minimumTmdbRating: null | number
 
   @ApiProperty()
@@ -63,8 +64,8 @@ export class Rule implements IRule {
   @ApiProperty()
   @IsArray()
   @IsOptional()
-  @ValidateNested()
   @Type(() => Tag)
+  @ValidateNested()
   tags: Tag[]
 
   @ApiProperty()
@@ -72,13 +73,13 @@ export class Rule implements IRule {
   updatedAt: Date
 
   @ApiProperty()
-  @IsOptional()
   @IsBoolean()
+  @IsOptional()
   watched: boolean | null
 
   @ApiProperty()
-  @IsOptional()
   @IsNumber()
+  @IsOptional()
   watchedDaysAgo: null | number
 
   constructor(partial: Partial<Rule>) {

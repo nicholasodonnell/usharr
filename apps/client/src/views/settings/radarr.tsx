@@ -1,5 +1,5 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import React from 'react'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { toast } from 'react-toastify'
 
 import Alert from '../../components/alert'
@@ -22,28 +22,33 @@ import {
   updateRadarrSettings,
 } from '../../lib/api'
 
-export default function Radarr(): JSX.Element {
+export default function Radarr(): React.ReactNode {
   const queryClient = useQueryClient()
 
-  const { data: settingsData, isLoading: settingsLoading } = useQuery(
-    'settings/radarr',
-    getRadarrSettings,
-  )
+  const { data: settingsData, isLoading: settingsLoading } = useQuery({
+    queryFn: getRadarrSettings,
+    queryKey: ['settings', 'radarr'],
+  })
 
-  const { data: pingData, isLoading: pingLoading } = useQuery(
-    'radarr/ping',
-    pingRadarr,
-  )
+  const { data: pingData, isLoading: pingLoading } = useQuery({
+    queryFn: pingRadarr,
+    queryKey: ['radarr', 'ping'],
+  })
 
-  const { mutateAsync: postPing } = useMutation(postPingRadarr)
+  const { mutateAsync: postPing } = useMutation({
+    mutationFn: postPingRadarr,
+  })
 
-  const { mutateAsync: update } = useMutation(updateRadarrSettings, {
+  const { mutateAsync: update } = useMutation({
+    mutationFn: updateRadarrSettings,
     onSettled: () => {
-      queryClient.invalidateQueries('settings/radarr')
+      queryClient.invalidateQueries({ queryKey: ['settings', 'radarr'] })
     },
   })
 
-  const { mutateAsync: radarrSync } = useMutation(syncRadarr)
+  const { mutateAsync: radarrSync } = useMutation({
+    mutationFn: syncRadarr,
+  })
 
   const [settings, setSettings] = useAsyncState(settingsData)
   const [ping, setPing] = useAsyncState(pingData)

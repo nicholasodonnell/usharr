@@ -2,7 +2,6 @@ import { Body, Controller, Get, Post } from '@nestjs/common'
 import { ApiOkResponse } from '@nestjs/swagger'
 
 import { RadarrSettings } from '../settings/settings.model'
-
 import { RadarrPing } from './radarr.model'
 import { RadarrService } from './radarr.service'
 

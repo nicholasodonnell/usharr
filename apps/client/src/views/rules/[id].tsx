@@ -1,6 +1,7 @@
 import type { Rule as RuleModel } from '@usharr/types'
+
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import React from 'react'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
@@ -8,25 +9,30 @@ import Rule from '../../components/rule'
 import Section, { Title } from '../../components/section'
 import { deleteRule, getRule, getTags, updateRule } from '../../lib/api'
 
-export default function EditRule(): JSX.Element {
+export default function EditRule(): React.ReactNode {
   const queryClient = useQueryClient()
   const { id } = useParams<{ id: string }>()
-  const { data: rule, isLoading: loading } = useQuery<RuleModel>(
-    `rule/${id}`,
-    () => getRule(id),
-  )
-  const { data: tags, isLoading: tagsLoading } = useQuery('tags', getTags)
+  const { data: rule, isLoading: loading } = useQuery<RuleModel>({
+    queryFn: () => getRule(id),
+    queryKey: ['rule', id],
+  })
+  const { data: tags, isLoading: tagsLoading } = useQuery({
+    queryFn: getTags,
+    queryKey: ['tags'],
+  })
   const navigate = useNavigate()
 
-  const { mutateAsync: update } = useMutation(updateRule, {
+  const { mutateAsync: update } = useMutation({
+    mutationFn: updateRule,
     onSettled: () => {
-      queryClient.invalidateQueries('rules')
+      queryClient.invalidateQueries({ queryKey: ['rules'] })
     },
   })
 
-  const { mutateAsync: destroy } = useMutation(deleteRule, {
+  const { mutateAsync: destroy } = useMutation({
+    mutationFn: deleteRule,
     onSettled: () => {
-      queryClient.invalidateQueries('rules')
+      queryClient.invalidateQueries({ queryKey: ['rules'] })
     },
   })
 

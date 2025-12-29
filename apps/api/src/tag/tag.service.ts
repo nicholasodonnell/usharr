@@ -7,8 +7,6 @@ import { Tag } from '../tag/tag.model'
 
 @Injectable()
 export class TagService {
-  private readonly logger = new Logger(TagService.name)
-
   readonly select: Prisma.TagSelect = {
     createdAt: true,
     id: true,
@@ -16,62 +14,9 @@ export class TagService {
     updatedAt: true,
   }
 
+  private readonly logger = new Logger(TagService.name)
+
   constructor(private prisma: PrismaService) {}
-
-  private async deleteMany(where: Prisma.TagWhereInput): Promise<void> {
-    await this.prisma.tag.deleteMany({
-      where,
-    })
-  }
-
-  private async findMany(
-    params: {
-      orderBy?: Prisma.TagOrderByWithRelationInput
-      skip?: number
-      take?: number
-      where?: Prisma.TagWhereInput
-    } = {},
-  ): Promise<Tag[]> {
-    const { orderBy, skip, take, where } = params
-
-    const records = await this.prisma.tag.findMany({
-      orderBy,
-      select: this.select,
-      skip,
-      take,
-      where,
-    })
-
-    return records.map(this.serializeRecord)
-  }
-
-  private serializeRecord(record): Tag {
-    const { createdAt, id, name, updatedAt } = record
-
-    return new Tag({
-      createdAt,
-      id,
-      name,
-      updatedAt,
-    })
-  }
-
-  private async upsert(params: {
-    create: Prisma.TagCreateInput
-    update: Prisma.TagUpdateInput
-    where: Prisma.TagWhereUniqueInput
-  }): Promise<Tag> {
-    const { create, update, where } = params
-
-    const record = await this.prisma.tag.upsert({
-      create,
-      select: this.select,
-      update,
-      where,
-    })
-
-    return this.serializeRecord(record)
-  }
 
   /**
    * Create a new tag record if one does not exist, otherwise update the existing record
@@ -129,5 +74,60 @@ export class TagService {
 
       throw error
     }
+  }
+
+  private async deleteMany(where: Prisma.TagWhereInput): Promise<void> {
+    await this.prisma.tag.deleteMany({
+      where,
+    })
+  }
+
+  private async findMany(
+    params: {
+      orderBy?: Prisma.TagOrderByWithRelationInput
+      skip?: number
+      take?: number
+      where?: Prisma.TagWhereInput
+    } = {},
+  ): Promise<Tag[]> {
+    const { orderBy, skip, take, where } = params
+
+    const records = await this.prisma.tag.findMany({
+      orderBy,
+      select: this.select,
+      skip,
+      take,
+      where,
+    })
+
+    return records.map(this.serializeRecord)
+  }
+
+  private serializeRecord(record): Tag {
+    const { createdAt, id, name, updatedAt } = record
+
+    return new Tag({
+      createdAt,
+      id,
+      name,
+      updatedAt,
+    })
+  }
+
+  private async upsert(params: {
+    create: Prisma.TagCreateInput
+    update: Prisma.TagUpdateInput
+    where: Prisma.TagWhereUniqueInput
+  }): Promise<Tag> {
+    const { create, update, where } = params
+
+    const record = await this.prisma.tag.upsert({
+      create,
+      select: this.select,
+      update,
+      where,
+    })
+
+    return this.serializeRecord(record)
   }
 }

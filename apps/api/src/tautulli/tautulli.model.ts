@@ -1,5 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger'
 import type { TautulliPing as ITautulliPing } from '@usharr/types'
+
+import { ApiProperty } from '@nestjs/swagger'
 import { IsBoolean } from 'class-validator'
 
 export class TautulliPing implements ITautulliPing {

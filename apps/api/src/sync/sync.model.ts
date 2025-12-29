@@ -1,5 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger'
 import type { Sync as ISync, SyncType } from '@usharr/types'
+
+import { ApiProperty } from '@nestjs/swagger'
 import {
   IsDate,
   IsNotEmpty,
@@ -15,8 +16,8 @@ export class Sync implements ISync {
   finishedAt: Date | null
 
   @ApiProperty()
-  @IsNumber()
   @IsNotEmpty()
+  @IsNumber()
   id: number
 
   @ApiProperty()
@@ -25,8 +26,8 @@ export class Sync implements ISync {
   startedAt: Date
 
   @ApiProperty()
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   type: SyncType
 
   constructor(partial: Partial<Sync>) {

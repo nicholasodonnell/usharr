@@ -15,7 +15,7 @@ import General from './views/settings/general'
 import Radarr from './views/settings/radarr'
 import Tautulli from './views/settings/tautulli'
 
-export default function App(): JSX.Element {
+export default function App(): React.ReactNode {
   return (
     <>
       <Routes>

@@ -1,10 +1,10 @@
-import { OmitType } from '@nestjs/swagger'
 import type { RuleDTO as IRuleDTO } from '@usharr/types'
+
+import { OmitType } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import { IsArray, IsOptional, ValidateNested } from 'class-validator'
 
 import { TagDTO } from '../tag/tag.dto'
-
 import { Rule } from './rule.model'
 
 export class RuleDTO
@@ -13,7 +13,7 @@ export class RuleDTO
 {
   @IsArray()
   @IsOptional()
-  @ValidateNested()
   @Type(() => TagDTO)
+  @ValidateNested()
   tags: TagDTO[]
 }

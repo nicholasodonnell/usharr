@@ -1,5 +1,3 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
 import type {
   ImportlistMovie,
   Movie,
@@ -13,13 +11,15 @@ import type {
   TautulliPing,
 } from '@usharr/types'
 
+import { Injectable, Logger } from '@nestjs/common'
+import { Prisma } from '@prisma/client'
+
 import { MovieService } from '../movie/movie.service'
 import { PrismaService } from '../prisma.service'
 import { RadarrService } from '../radarr/radarr.service'
 import { RuleService } from '../rule/rule.service'
 import { TagService } from '../tag/tag.service'
 import { TautulliService } from '../tautulli/tautulli.service'
-
 import { Sync } from './sync.model'
 
 const select: Prisma.SyncSelect = {
@@ -43,77 +43,6 @@ export class SyncService {
     private tag: TagService,
     private tautulli: TautulliService,
   ) {}
-
-  private async create(data?: Prisma.SyncCreateInput): Promise<Sync> {
-    const record = await this.prisma.sync.create({
-      data,
-      select,
-    })
-
-    return this.serializeRecord(record)
-  }
-
-  private async findFirst(params: {
-    orderBy?: Prisma.SyncOrderByWithRelationInput
-    where: Prisma.SyncWhereInput
-  }): Promise<Sync | null> {
-    const { orderBy, where } = params
-
-    const record = await this.prisma.sync.findFirst({
-      orderBy,
-      select,
-      where,
-    })
-
-    return record ? this.serializeRecord(record) : null
-  }
-
-  private async findMany(
-    params: {
-      orderBy?: Prisma.SyncOrderByWithRelationInput
-      skip?: number
-      take?: number
-      where?: Prisma.SyncWhereInput
-    } = {},
-  ): Promise<Sync[]> {
-    const { orderBy, skip, take, where } = params
-
-    const records = await this.prisma.sync.findMany({
-      orderBy,
-      select,
-      skip,
-      take,
-      where,
-    })
-
-    return records.map(this.serializeRecord)
-  }
-
-  private serializeRecord(record): Sync {
-    const { finishedAt, id, startedAt, type } = record
-
-    return new Sync({
-      finishedAt: finishedAt ? new Date(finishedAt) : null,
-      id,
-      startedAt: new Date(startedAt),
-      type,
-    })
-  }
-
-  private async update(params: {
-    data?: Prisma.SyncUpdateInput
-    where: Prisma.SyncWhereUniqueInput
-  }): Promise<Sync> {
-    const { data, where } = params
-
-    const record = await this.prisma.sync.update({
-      data,
-      select,
-      where,
-    })
-
-    return this.serializeRecord(record)
-  }
 
   /**
    * Deletes movies that match a rule
@@ -196,7 +125,7 @@ export class SyncService {
   /**
    * Returns the last finished FULL sync
    */
-  async getLast(type?: SyncType): Promise<Sync | null> {
+  async getLast(type?: SyncType): Promise<null | Sync> {
     try {
       return await this.findFirst({
         orderBy: { finishedAt: 'desc' },
@@ -315,7 +244,7 @@ export class SyncService {
       this.logger.log('Starting partial sync')
       sync = await this.start(SyncService.PARTIAL)
 
-      const lastSync: Sync | null = await this.getLast()
+      const lastSync: null | Sync = await this.getLast()
 
       await this.tags()
       await this.movies()
@@ -399,9 +328,8 @@ export class SyncService {
       }
 
       const moviesToSync: Movie[] = await this.movie.getNotDeleted()
-      const watchHistory: TautulliHistory[] = await this.tautulli.getHistory(
-        since,
-      )
+      const watchHistory: TautulliHistory[] =
+        await this.tautulli.getHistory(since)
 
       for (const movie of moviesToSync) {
         const titles = [movie.title, ...movie.alternativeTitles]
@@ -428,5 +356,76 @@ export class SyncService {
 
       throw error
     }
+  }
+
+  private async create(data?: Prisma.SyncCreateInput): Promise<Sync> {
+    const record = await this.prisma.sync.create({
+      data,
+      select,
+    })
+
+    return this.serializeRecord(record)
+  }
+
+  private async findFirst(params: {
+    orderBy?: Prisma.SyncOrderByWithRelationInput
+    where: Prisma.SyncWhereInput
+  }): Promise<null | Sync> {
+    const { orderBy, where } = params
+
+    const record = await this.prisma.sync.findFirst({
+      orderBy,
+      select,
+      where,
+    })
+
+    return record ? this.serializeRecord(record) : null
+  }
+
+  private async findMany(
+    params: {
+      orderBy?: Prisma.SyncOrderByWithRelationInput
+      skip?: number
+      take?: number
+      where?: Prisma.SyncWhereInput
+    } = {},
+  ): Promise<Sync[]> {
+    const { orderBy, skip, take, where } = params
+
+    const records = await this.prisma.sync.findMany({
+      orderBy,
+      select,
+      skip,
+      take,
+      where,
+    })
+
+    return records.map(this.serializeRecord)
+  }
+
+  private serializeRecord(record): Sync {
+    const { finishedAt, id, startedAt, type } = record
+
+    return new Sync({
+      finishedAt: finishedAt ? new Date(finishedAt) : null,
+      id,
+      startedAt: new Date(startedAt),
+      type,
+    })
+  }
+
+  private async update(params: {
+    data?: Prisma.SyncUpdateInput
+    where: Prisma.SyncWhereUniqueInput
+  }): Promise<Sync> {
+    const { data, where } = params
+
+    const record = await this.prisma.sync.update({
+      data,
+      select,
+      where,
+    })
+
+    return this.serializeRecord(record)
   }
 }

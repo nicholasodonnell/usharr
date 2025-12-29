@@ -3,11 +3,6 @@ import React from 'react'
 
 import { H3, P } from './text'
 
-export type TitleProps = {
-  children: React.ReactNode
-  className?: string
-}
-
 export type DescriptionProps = {
   children: React.ReactNode
   className?: string
@@ -18,7 +13,32 @@ export type SectionProps = {
   className?: string
 }
 
-export function Title({ children, className }: TitleProps): JSX.Element {
+export type TitleProps = {
+  children: React.ReactNode
+  className?: string
+}
+
+export function Description({
+  children,
+  className,
+}: DescriptionProps): React.ReactNode {
+  return (
+    <P className={cx('mb-5 text-gray', className)} italic>
+      {children}
+    </P>
+  )
+}
+
+export function Section({
+  children,
+  className,
+}: SectionProps): React.ReactNode {
+  return (
+    <section className={cx('flex flex-col', className)}>{children}</section>
+  )
+}
+
+export function Title({ children, className }: TitleProps): React.ReactNode {
   return (
     <H3
       className={cx(
@@ -27,23 +47,6 @@ export function Title({ children, className }: TitleProps): JSX.Element {
       )}>
       {children}
     </H3>
-  )
-}
-
-export function Description({
-  children,
-  className,
-}: DescriptionProps): JSX.Element {
-  return (
-    <P className={cx('mb-5 text-gray', className)} italic>
-      {children}
-    </P>
-  )
-}
-
-export function Section({ children, className }: SectionProps): JSX.Element {
-  return (
-    <section className={cx('flex flex-col', className)}>{children}</section>
   )
 }
 

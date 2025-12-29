@@ -6,7 +6,7 @@ module.exports = {
   semi: false,
   singleQuote: true,
   tabWidth: 2,
-  tailwindConfig: './tailwind.config.js',
   tailwindFunctions: ['classNames', 'cx'],
+  tailwindStylesheet: './src/styles/index.css',
   trailingComma: 'all',
 }

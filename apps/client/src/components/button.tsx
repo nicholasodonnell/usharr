@@ -21,7 +21,7 @@ export default function Button({
   secondary = false,
   type = 'button',
   warning = false,
-}: ButtonProps): JSX.Element {
+}: ButtonProps): React.ReactNode {
   const handleClick = () => {
     onClick?.()
   }

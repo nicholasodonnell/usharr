@@ -1,10 +1,10 @@
-import { OmitType } from '@nestjs/swagger'
 import type { MovieDTO as IMovieDTO } from '@usharr/types'
+
+import { OmitType } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import { IsArray, IsOptional, ValidateNested } from 'class-validator'
 
 import { TagDTO } from '../tag/tag.dto'
-
 import { Movie } from './movie.model'
 
 export class MovieDTO

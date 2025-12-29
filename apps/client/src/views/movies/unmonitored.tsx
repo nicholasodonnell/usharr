@@ -1,16 +1,16 @@
+import { useQuery } from '@tanstack/react-query'
 import React, { useState } from 'react'
-import { useQuery } from 'react-query'
 
 import { Input } from '../../components/form'
 import Movies, { Movie } from '../../components/movies'
 import Section, { Title } from '../../components/section'
 import { getUnmonitoredMovies } from '../../lib/api'
 
-export default function Unmonitored(): JSX.Element {
-  const { data: movies, isLoading } = useQuery(
-    'movies/unmonitored',
-    getUnmonitoredMovies,
-  )
+export default function Unmonitored(): React.ReactNode {
+  const { data: movies, isLoading } = useQuery({
+    queryFn: getUnmonitoredMovies,
+    queryKey: ['movies', 'unmonitored'],
+  })
   const [search, setSearch] = useState<string>('')
 
   return (
@@ -29,7 +29,9 @@ export default function Unmonitored(): JSX.Element {
               ? movie.title.toLowerCase().includes(search.toLowerCase())
               : true,
           )
-          ?.map((movie) => <Movie key={movie.id} movie={movie} />)}
+          ?.map((movie) => (
+            <Movie key={movie.id} movie={movie} />
+          ))}
       </Movies>
     </Section>
   )
