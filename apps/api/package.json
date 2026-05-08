@@ -35,7 +35,7 @@
     "@usharr/eslint-config-custom": "0.0.0",
     "@usharr/types": "0.0.0",
     "eslint": "^9.39.2",
-    "prisma": "^7.2.0",
+    "prisma": "^7.8.0",
     "source-map-support": "^0.5.21",
     "ts-loader": "^9.5.4",
     "ts-node": "^10.9.2",
